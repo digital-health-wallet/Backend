@@ -51,11 +51,13 @@ public class AgendamentoEntity {
     @Column(nullable = false, length = 1)
     private StatusAgendamento status;
 
+    @Builder.Default
     @Column(nullable = false)
-    private Boolean favorito;
+    private Boolean favorito = false;
 
+    @Builder.Default
     @Column(nullable = false)
-    private Boolean arquivado;
+    private Boolean arquivado = false;
 
     @Column(name = "google_event_id", length = 128)
     private String googleEventId;

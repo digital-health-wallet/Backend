@@ -2,6 +2,7 @@ package br.com.healthwallet.web.controller;
 
 
 import br.com.healthwallet.application.usecase.AgendamentoUseCase;
+import br.com.healthwallet.application.usecase.SincronizarAgendaUseCase;
 import br.com.healthwallet.domain.model.Agendamento;
 import br.com.healthwallet.domain.model.enums.StatusAgendamento;
 import br.com.healthwallet.web.dto.AgendamentoRequest;
@@ -20,12 +21,30 @@ import java.util.List;
 public class AgendamentoController {
 
     private final AgendamentoUseCase agendamentoUseCase;
+    private final SincronizarAgendaUseCase sincronizarAgendaUseCase;
 
     @PostMapping
     public ResponseEntity<AgendamentoResponse> criar(@Valid @RequestBody AgendamentoRequest request) {
         Agendamento agendamento = toModel(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(AgendamentoResponse.from(agendamentoUseCase.criar(agendamento)));
+    }
+
+    @PostMapping("/sincronizar-google/sugestoes")
+    public ResponseEntity<List<Agendamento>> buscarSugestoesGoogle(
+            @RequestParam Long idPaciente,
+            @RequestHeader("Google-Token") String accessToken) {
+
+        List<Agendamento> sugestoes = sincronizarAgendaUseCase.buscarSugestoes(idPaciente, accessToken);
+        return ResponseEntity.ok(sugestoes);
+    }
+
+    @PostMapping("/sincronizar-google/confirmar")
+    public ResponseEntity<Void> confirmarImportacao(
+            @RequestBody List<Agendamento> selecionados) {
+
+        sincronizarAgendaUseCase.salvarSelecionados(selecionados);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/{id}")

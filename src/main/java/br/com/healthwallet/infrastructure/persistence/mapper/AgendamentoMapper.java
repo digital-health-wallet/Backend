@@ -41,8 +41,8 @@ public class AgendamentoMapper {
                 .horaAgendamento(agendamento.getHoraAgendamento())
                 .horaFim(agendamento.getHoraFim())
                 .status(agendamento.getStatus())
-                .favorito(agendamento.getFavorito())
-                .arquivado(agendamento.getArquivado())
+                .favorito(agendamento.getFavorito() != null ? agendamento.getFavorito() : false)
+                .arquivado(agendamento.getArquivado() != null ? agendamento.getArquivado() : false)
                 .googleEventId(agendamento.getGoogleEventId())
                 .build();
     }
