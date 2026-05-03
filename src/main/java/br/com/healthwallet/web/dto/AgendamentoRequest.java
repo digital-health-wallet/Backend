@@ -9,6 +9,8 @@ import java.time.LocalTime;
 
 public record AgendamentoRequest(
         @NotNull Long idPaciente,
+        Long idProfissional,
+        ProfissionalRequest profissional,
         @NotBlank String especialidade,
         String nomeClinica,
         String motivoConsulta,

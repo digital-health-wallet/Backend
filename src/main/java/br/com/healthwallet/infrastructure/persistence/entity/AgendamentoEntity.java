@@ -25,6 +25,10 @@ public class AgendamentoEntity {
     @JoinColumn(name = "id_paciente", nullable = false)
     private PacienteEntity paciente;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_profissional")
+    private ProfissionalEntity profissional;
+
     @Column(nullable = false, length = 70)
     private String especialidade;
 

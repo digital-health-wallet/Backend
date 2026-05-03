@@ -1,20 +1,37 @@
 package br.com.healthwallet.application.usecase;
 
 import br.com.healthwallet.domain.model.Agendamento;
+import br.com.healthwallet.domain.model.Profissional;
 import br.com.healthwallet.domain.model.enums.StatusAgendamento;
 import br.com.healthwallet.domain.repository.AgendamentoRepository;
+import br.com.healthwallet.domain.repository.ProfissionalRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AgendamentoUseCase {
 
     private final AgendamentoRepository agendamentoRepository;
+    private final ProfissionalRepository profissionalRepository;
 
-    public Agendamento criar(Agendamento agendamento){
+    public Agendamento criar(Agendamento agendamento) {
+        if (agendamento.getIdProfissional() == null && agendamento.getProfissional() != null) {
+
+            Optional<Profissional> existente = profissionalRepository
+                    .buscarPorNome(agendamento.getProfissional().getNomeProfissional());
+
+            if (existente.isPresent()) {
+                agendamento.setIdProfissional(existente.get().getId());
+            } else {
+                Profissional salvo = profissionalRepository.salvar(agendamento.getProfissional());
+                agendamento.setIdProfissional(salvo.getId());
+            }
+        }
+        agendamento.setProfissional(null);
         agendamento.setStatus(StatusAgendamento.AGENDADO);
         agendamento.setFavorito(false);
         agendamento.setArquivado(false);

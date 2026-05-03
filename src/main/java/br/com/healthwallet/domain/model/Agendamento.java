@@ -20,6 +20,28 @@ public class Agendamento {
     private Boolean favorito;
     private Boolean arquivado;
     private String googleEventId;
+    private Long idProfissional;
+    private String nomeProfissional;
+    private Profissional profissional;
+
+    public Profissional getProfissional() { return profissional; }
+    public void setProfissional(Profissional profissional) { this.profissional = profissional; }
+
+    public Long getIdProfissional() {
+        return idProfissional;
+    }
+
+    public void setIdProfissional(Long idProfissional) {
+        this.idProfissional = idProfissional;
+    }
+
+    public String getNomeProfissional() {
+        return nomeProfissional;
+    }
+
+    public void setNomeProfissional(String nomeProfissional) {
+        this.nomeProfissional = nomeProfissional;
+    }
 
     public Long getId() {
         return id;

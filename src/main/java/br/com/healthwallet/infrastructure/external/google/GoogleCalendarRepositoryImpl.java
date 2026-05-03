@@ -48,20 +48,13 @@ public class GoogleCalendarRepositoryImpl implements GoogleCalendarRepository {
 
             Events events = service.events().list("primary")
                     //.setQ(queryMedica)
-                    .setTimeMin(timeMin)           // Filtra de hoje em diante
-                    .setSingleEvents(true)         // Separa os eventos que se repetem toda semana
-                    .setOrderBy("startTime")       // Ordena do mais perto para o mais longe
+                    .setTimeMin(timeMin)
+                    .setSingleEvents(true)
+                    .setOrderBy("startTime")
                     .setMaxResults(50)
                     .execute();
 
             List<com.google.api.services.calendar.model.Event> items = events.getItems();
-
-            System.out.println("========== DEBUG DO GOOGLE ==========");
-            System.out.println("Eventos achados na API: " + (items != null ? items.size() : 0));
-            if (items != null) {
-                items.forEach(i -> System.out.println("Título: " + i.getSummary()));
-            }
-            System.out.println("=====================================");
 
             if (items == null || items.isEmpty()) {
                 return new ArrayList<>();

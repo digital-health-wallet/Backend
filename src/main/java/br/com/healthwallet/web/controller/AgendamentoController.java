@@ -4,6 +4,8 @@ package br.com.healthwallet.web.controller;
 import br.com.healthwallet.application.usecase.AgendamentoUseCase;
 import br.com.healthwallet.application.usecase.SincronizarAgendaUseCase;
 import br.com.healthwallet.domain.model.Agendamento;
+import br.com.healthwallet.domain.model.Endereco;
+import br.com.healthwallet.domain.model.Profissional;
 import br.com.healthwallet.domain.model.enums.StatusAgendamento;
 import br.com.healthwallet.web.dto.AgendamentoRequest;
 import br.com.healthwallet.web.dto.AgendamentoResponse;
@@ -97,6 +99,7 @@ public class AgendamentoController {
     private Agendamento toModel(AgendamentoRequest request) {
         Agendamento agendamento = new Agendamento();
         agendamento.setIdPaciente(request.idPaciente());
+        agendamento.setIdProfissional(request.idProfissional());
         agendamento.setEspecialidade(request.especialidade());
         agendamento.setNomeClinica(request.nomeClinica());
         agendamento.setMotivoConsulta(request.motivoConsulta());
@@ -104,6 +107,32 @@ public class AgendamentoController {
         agendamento.setDataAgendamento(request.dataAgendamento());
         agendamento.setHoraAgendamento(request.horaAgendamento());
         agendamento.setHoraFim(request.horaFim());
+
+        if (request.profissional() != null) {
+           Profissional profissional = new Profissional();
+            profissional.setNomeProfissional(request.profissional().nomeProfissional());
+            profissional.setEspecialidade(request.profissional().especialidade());
+            profissional.setContato(request.profissional().contato());
+            profissional.setNomeClinica(request.profissional().nomeClinica());
+            profissional.setEmail(request.profissional().email());
+            profissional.setNumeroIdentificacaoProfissional(request.profissional().numeroIdentificacaoProfissional());
+
+            if (request.profissional().endereco() != null) {
+                Endereco endereco = new Endereco();
+                endereco.setCep(request.profissional().endereco().cep());
+                endereco.setLogradouro(request.profissional().endereco().logradouro());
+                endereco.setNumero(request.profissional().endereco().numero());
+                endereco.setBairro(request.profissional().endereco().bairro());
+                endereco.setCidade(request.profissional().endereco().cidade());
+                endereco.setEstado(request.profissional().endereco().estado());
+                endereco.setComplemento(request.profissional().endereco().complemento());
+                profissional.setEndereco(endereco);
+            }
+
+            agendamento.setProfissional(profissional);
+        }
+
+
         return agendamento;
     }
 }

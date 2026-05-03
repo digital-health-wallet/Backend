@@ -10,6 +10,7 @@ import java.time.LocalTime;
 public record AgendamentoResponse(
         Long id,
         Long idPaciente,
+        Long idProfissional,
         String especialidade,
         String nomeClinica,
         String motivoConsulta,
@@ -25,6 +26,7 @@ public record AgendamentoResponse(
         return new AgendamentoResponse(
                 agendamento.getId(),
                 agendamento.getIdPaciente(),
+                agendamento.getIdProfissional(),
                 agendamento.getEspecialidade(),
                 agendamento.getNomeClinica(),
                 agendamento.getMotivoConsulta(),
