@@ -1,7 +1,7 @@
 package br.com.healthwallet.application.usecase;
 
+import br.com.healthwallet.domain.model.Endereco;
 import br.com.healthwallet.domain.model.Profissional;
-// IMPORTANTE: Importar a interface do domínio!
 import br.com.healthwallet.domain.repository.ProfissionalRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GerenciarProfissionalUseCase {
 
-    // CORREÇÃO 1: Injetando a interface de domínio, e não a do JPA
     private final ProfissionalRepository profissionalRepository;
-
-    // CORREÇÃO 2: Métodos que o Controller estava pedindo e não existiam aqui
 
     public List<Profissional> listarTodos() {
         return profissionalRepository.listarTodos();
@@ -29,14 +26,43 @@ public class GerenciarProfissionalUseCase {
 
     @Transactional
     public void deletar(Long id) {
-        buscarPorId(id); // Garante que existe antes de tentar deletar
+        buscarPorId(id);
         profissionalRepository.deletar(id);
     }
 
-    // Seus métodos originais agora usando o profissionalRepository correto:
-
     @Transactional
     public Profissional salvarOuAtualizar(Profissional profissional) {
+        if (profissional.getId() != null) {
+            Profissional existente = profissionalRepository.buscarPorId(profissional.getId())
+                    .orElseThrow(() -> new RuntimeException("Profissional não encontrado com id: " + profissional.getId()));
+
+            existente.setNomeProfissional(profissional.getNomeProfissional());
+            existente.setEspecialidade(profissional.getEspecialidade());
+            existente.setContato(profissional.getContato());
+            existente.setEmail(profissional.getEmail());
+            existente.setNomeClinica(profissional.getNomeClinica());
+            existente.setNumeroIdentificacaoProfissional(profissional.getNumeroIdentificacaoProfissional());
+
+            if (profissional.getEndereco() != null) {
+                if (existente.getEndereco() == null) {
+                    existente.setEndereco(new Endereco());
+                }
+
+                Endereco endExistente = existente.getEndereco();
+                Endereco endNovo = profissional.getEndereco();
+
+                endExistente.setCep(endNovo.getCep());
+                endExistente.setLogradouro(endNovo.getLogradouro());
+                endExistente.setNumero(endNovo.getNumero());
+                endExistente.setBairro(endNovo.getBairro());
+                endExistente.setCidade(endNovo.getCidade());
+                endExistente.setEstado(endNovo.getEstado());
+                endExistente.setComplemento(endNovo.getComplemento());
+            }
+
+            return profissionalRepository.salvar(existente);
+        }
+
         return profissionalRepository.salvar(profissional);
     }
 
