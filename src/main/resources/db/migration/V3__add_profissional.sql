@@ -15,7 +15,7 @@ CREATE TABLE profissionais (
                                nome_profissional                   VARCHAR(50),
                                numero_identificacao_profissional   VARCHAR(20),
                                contato                             VARCHAR(20),
-                               nome_clinica                        VARCHAR(30),
+                               nome_clinica                        VARCHAR(300),
                                email                               VARCHAR(50),
                                especialidade                       VARCHAR(70)
 );
