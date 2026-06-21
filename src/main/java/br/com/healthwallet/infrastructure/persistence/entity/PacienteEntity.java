@@ -25,6 +25,9 @@ public class PacienteEntity {
     @Column(nullable = false, length = 50)
     private String nome;
 
+    @Column(length = 14)
+    private String cpf;
+
     @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
 

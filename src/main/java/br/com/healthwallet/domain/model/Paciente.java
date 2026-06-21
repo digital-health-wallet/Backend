@@ -6,6 +6,7 @@ public class Paciente {
     private Long id;
     private Long idUsuario;
     private String nome;
+    private String cpf;
     private LocalDate dataNascimento;
     private String tipoSanguineo;
     private String codigoEmergencia;
@@ -34,6 +35,9 @@ public class Paciente {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
 
     public LocalDate getDataNascimento() {
         return dataNascimento;
