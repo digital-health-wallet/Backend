@@ -3,14 +3,41 @@ package br.com.healthwallet.infrastructure.external.google;
 import br.com.healthwallet.domain.model.Agendamento;
 import br.com.healthwallet.domain.model.enums.StatusAgendamento;
 import br.com.healthwallet.domain.model.enums.TipoConsulta;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Component
 public class GoogleEventMapper {
+
+    /**
+     * Converte um Agendamento local em um Evento do Google Calendar (RF06, UC03/UC04).
+     */
+    public Event toGoogleEvent(Agendamento agendamento) {
+        Event event = new Event();
+        event.setSummary(agendamento.getEspecialidade());
+        event.setLocation(agendamento.getNomeClinica());
+        event.setDescription(agendamento.getMotivoConsulta());
+
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalTime horaFim = agendamento.getHoraFim() != null
+                ? agendamento.getHoraFim()
+                : agendamento.getHoraAgendamento().plusHours(1);
+
+        ZonedDateTime inicio = ZonedDateTime.of(agendamento.getDataAgendamento(), agendamento.getHoraAgendamento(), zoneId);
+        ZonedDateTime fim = ZonedDateTime.of(agendamento.getDataAgendamento(), horaFim, zoneId);
+
+        event.setStart(new EventDateTime().setDateTime(new DateTime(inicio.toInstant().toEpochMilli())));
+        event.setEnd(new EventDateTime().setDateTime(new DateTime(fim.toInstant().toEpochMilli())));
+
+        return event;
+    }
     public Agendamento toDomain(Event googleEvent) {
         Agendamento agendamento = new Agendamento();
 

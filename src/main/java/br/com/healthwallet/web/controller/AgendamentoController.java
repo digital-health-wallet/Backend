@@ -2,11 +2,14 @@ package br.com.healthwallet.web.controller;
 
 
 import br.com.healthwallet.application.usecase.AgendamentoUseCase;
+import br.com.healthwallet.application.usecase.GoogleTokenUseCase;
+import br.com.healthwallet.application.usecase.ResultadoAgendamento;
 import br.com.healthwallet.application.usecase.SincronizarAgendaUseCase;
 import br.com.healthwallet.domain.model.Agendamento;
 import br.com.healthwallet.domain.model.Endereco;
 import br.com.healthwallet.domain.model.Profissional;
 import br.com.healthwallet.domain.model.enums.StatusAgendamento;
+import br.com.healthwallet.infrastructure.security.AuthenticatedUser;
 import br.com.healthwallet.web.dto.AgendamentoRequest;
 import br.com.healthwallet.web.dto.AgendamentoResponse;
 import jakarta.validation.Valid;
@@ -24,19 +27,20 @@ public class AgendamentoController {
 
     private final AgendamentoUseCase agendamentoUseCase;
     private final SincronizarAgendaUseCase sincronizarAgendaUseCase;
+    private final GoogleTokenUseCase googleTokenUseCase;
 
     @PostMapping
     public ResponseEntity<AgendamentoResponse> criar(@Valid @RequestBody AgendamentoRequest request) {
         Agendamento agendamento = toModel(request);
+        boolean sincronizarGoogle = Boolean.TRUE.equals(request.sincronizarGoogle());
+        ResultadoAgendamento resultado = agendamentoUseCase.criar(agendamento, sincronizarGoogle, AuthenticatedUser.idOuFalhar());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(AgendamentoResponse.from(agendamentoUseCase.criar(agendamento)));
+                .body(AgendamentoResponse.from(resultado.agendamento(), resultado.avisoGoogle()));
     }
 
     @PostMapping("/sincronizar-google/sugestoes")
-    public ResponseEntity<List<Agendamento>> buscarSugestoesGoogle(
-            @RequestParam Long idPaciente,
-            @RequestHeader("Google-Token") String accessToken) {
-
+    public ResponseEntity<List<Agendamento>> buscarSugestoesGoogle(@RequestParam Long idPaciente) {
+        String accessToken = googleTokenUseCase.obterAccessTokenValido(AuthenticatedUser.idOuFalhar());
         List<Agendamento> sugestoes = sincronizarAgendaUseCase.buscarSugestoes(idPaciente, accessToken);
         return ResponseEntity.ok(sugestoes);
     }
@@ -69,15 +73,15 @@ public class AgendamentoController {
     @PutMapping("/{id}")
     public ResponseEntity<AgendamentoResponse> atualizar(@PathVariable Long id,
                                                          @Valid @RequestBody AgendamentoRequest request) {
-        return ResponseEntity.ok(AgendamentoResponse.from(
-                agendamentoUseCase.atualizar(id, toModel(request))));
+        ResultadoAgendamento resultado = agendamentoUseCase.atualizar(id, toModel(request), AuthenticatedUser.idOuFalhar());
+        return ResponseEntity.ok(AgendamentoResponse.from(resultado.agendamento(), resultado.avisoGoogle()));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<AgendamentoResponse> atualizarStatus(@PathVariable Long id,
                                                                @RequestParam StatusAgendamento status) {
-        return ResponseEntity.ok(AgendamentoResponse.from(
-                agendamentoUseCase.atualizarStatus(id, status)));
+        ResultadoAgendamento resultado = agendamentoUseCase.atualizarStatus(id, status, AuthenticatedUser.idOuFalhar());
+        return ResponseEntity.ok(AgendamentoResponse.from(resultado.agendamento(), resultado.avisoGoogle()));
     }
 
     @PatchMapping("/{id}/arquivar")

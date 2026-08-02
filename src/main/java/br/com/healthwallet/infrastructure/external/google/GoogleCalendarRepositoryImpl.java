@@ -39,15 +39,10 @@ public class GoogleCalendarRepositoryImpl implements GoogleCalendarRepository {
                     .setApplicationName("Health Wallet")
                     .build();
 
-            // 1. Pega o início do dia de hoje para não perder consultas da manhã
             ZonedDateTime inicioDoDia = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
             DateTime timeMin = new DateTime(inicioDoDia.toInstant().toEpochMilli());
 
-            //filtro personalizado para facilitar a listagem de eventos
-            String queryMedica = "consulta médico exame hospital retorno dentista";
-
             Events events = service.events().list("primary")
-                    //.setQ(queryMedica)
                     .setTimeMin(timeMin)
                     .setSingleEvents(true)
                     .setOrderBy("startTime")
@@ -68,5 +63,65 @@ public class GoogleCalendarRepositoryImpl implements GoogleCalendarRepository {
             e.printStackTrace();
             throw new RuntimeException("Erro ao buscar agenda do Google: " + e.getMessage());
         }
+    }
+
+    @Override
+    public String criarCalendario(String accessToken, String nomeCalendario) {
+        try {
+            Calendar service = construirServico(accessToken);
+
+            com.google.api.services.calendar.model.Calendar novaAgenda =
+                    new com.google.api.services.calendar.model.Calendar().setSummary(nomeCalendario);
+
+            com.google.api.services.calendar.model.Calendar criada = service.calendars().insert(novaAgenda).execute();
+            return criada.getId();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao criar agenda no Google Calendar: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String criarEvento(String accessToken, String calendarId, Agendamento agendamento) {
+        try {
+            Calendar service = construirServico(accessToken);
+            com.google.api.services.calendar.model.Event evento = googleMapper.toGoogleEvent(agendamento);
+            com.google.api.services.calendar.model.Event criado = service.events().insert(calendarId, evento).execute();
+            return criado.getId();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao criar evento no Google Calendar: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void atualizarEvento(String accessToken, String calendarId, String googleEventId, Agendamento agendamento) {
+        try {
+            Calendar service = construirServico(accessToken);
+            com.google.api.services.calendar.model.Event evento = googleMapper.toGoogleEvent(agendamento);
+            service.events().update(calendarId, googleEventId, evento).execute();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao atualizar evento no Google Calendar: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void removerEvento(String accessToken, String calendarId, String googleEventId) {
+        try {
+            Calendar service = construirServico(accessToken);
+            service.events().delete(calendarId, googleEventId).execute();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao remover evento do Google Calendar: " + e.getMessage(), e);
+        }
+    }
+
+    private Calendar construirServico(String accessToken) throws Exception {
+        HttpRequestInitializer requestInitializer = request ->
+                request.getHeaders().setAuthorization("Bearer " + accessToken);
+
+        return new Calendar.Builder(
+                GoogleNetHttpTransport.newTrustedTransport(),
+                GsonFactory.getDefaultInstance(),
+                requestInitializer)
+                .setApplicationName("Health Wallet")
+                .build();
     }
 }

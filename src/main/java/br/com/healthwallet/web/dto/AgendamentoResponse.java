@@ -20,9 +20,15 @@ public record AgendamentoResponse(
         LocalTime horaFim,
         StatusAgendamento status,
         Boolean favorito,
-        Boolean arquivado
+        Boolean arquivado,
+        String googleEventId,
+        String avisoGoogle
 ) {
     public static AgendamentoResponse from(Agendamento agendamento) {
+        return from(agendamento, null);
+    }
+
+    public static AgendamentoResponse from(Agendamento agendamento, String avisoGoogle) {
         return new AgendamentoResponse(
                 agendamento.getId(),
                 agendamento.getIdPaciente(),
@@ -36,7 +42,9 @@ public record AgendamentoResponse(
                 agendamento.getHoraFim(),
                 agendamento.getStatus(),
                 agendamento.getFavorito(),
-                agendamento.getArquivado()
+                agendamento.getArquivado(),
+                agendamento.getGoogleEventId(),
+                avisoGoogle
         );
     }
 }

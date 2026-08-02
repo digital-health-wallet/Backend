@@ -17,6 +17,7 @@ public record AgendamentoRequest(
         TipoConsulta tipoConsulta,
         @NotNull LocalDate dataAgendamento,
         @NotNull LocalTime horaAgendamento,
-        LocalTime horaFim
+        LocalTime horaFim,
+        Boolean sincronizarGoogle
 ) {
 }
