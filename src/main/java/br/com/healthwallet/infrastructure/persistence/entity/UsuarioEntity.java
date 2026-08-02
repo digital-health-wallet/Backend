@@ -27,4 +27,13 @@ public class UsuarioEntity {
 
     @Column(name = "data_desativacao")
     private LocalDateTime dataDesativacao;
+
+    @Column(name = "google_access_token", columnDefinition = "TEXT")
+    private String googleAccessToken;
+
+    @Column(name = "google_refresh_token", columnDefinition = "TEXT")
+    private String googleRefreshToken;
+
+    @Column(name = "google_token_expiration")
+    private LocalDateTime googleTokenExpiration;
 }

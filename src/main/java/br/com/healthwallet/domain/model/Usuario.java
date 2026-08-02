@@ -7,6 +7,9 @@ public class Usuario {
     private String email;
     private Boolean ativo;
     private LocalDateTime dataDesativacao;
+    private String googleAccessToken;
+    private String googleRefreshToken;
+    private LocalDateTime googleTokenExpiration;
 
     public Long getId() {
         return id;
@@ -38,5 +41,33 @@ public class Usuario {
 
     public void setDataDesativacao(LocalDateTime dataDesativacao) {
         this.dataDesativacao = dataDesativacao;
+    }
+
+    public String getGoogleAccessToken() {
+        return googleAccessToken;
+    }
+
+    public void setGoogleAccessToken(String googleAccessToken) {
+        this.googleAccessToken = googleAccessToken;
+    }
+
+    public String getGoogleRefreshToken() {
+        return googleRefreshToken;
+    }
+
+    public void setGoogleRefreshToken(String googleRefreshToken) {
+        this.googleRefreshToken = googleRefreshToken;
+    }
+
+    public LocalDateTime getGoogleTokenExpiration() {
+        return googleTokenExpiration;
+    }
+
+    public void setGoogleTokenExpiration(LocalDateTime googleTokenExpiration) {
+        this.googleTokenExpiration = googleTokenExpiration;
+    }
+
+    public boolean possuiCalendarConectado() {
+        return googleRefreshToken != null && !googleRefreshToken.isBlank();
     }
 }
