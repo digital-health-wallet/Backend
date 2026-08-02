@@ -88,7 +88,7 @@ public class ReceitaMapper {
         return entity;
     }
 
-    private ItemReceita itemToDomain(ItemReceitaEntity entity) {
+    public ItemReceita itemToDomain(ItemReceitaEntity entity) {
         ItemReceita domain = new ItemReceita();
         domain.setId(entity.getId());
         domain.setPosologia(entity.getPosologia());

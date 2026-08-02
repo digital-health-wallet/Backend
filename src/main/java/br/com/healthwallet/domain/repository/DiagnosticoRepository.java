@@ -8,5 +8,6 @@ public interface DiagnosticoRepository {
     Diagnostico salvar(Diagnostico diagnostico);
     Optional<Diagnostico> buscarPorId(Long id);
     List<Diagnostico> buscarPorAgendamento(Long idAgendamento);
+    List<Diagnostico> buscarCronicosPorPaciente(Long idPaciente);
     void deletar(Long id);
 }

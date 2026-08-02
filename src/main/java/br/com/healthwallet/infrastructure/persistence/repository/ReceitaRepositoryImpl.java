@@ -1,5 +1,6 @@
 package br.com.healthwallet.infrastructure.persistence.repository;
 
+import br.com.healthwallet.domain.model.ItemReceita;
 import br.com.healthwallet.domain.model.Receita;
 import br.com.healthwallet.domain.repository.ReceitaRepository;
 import br.com.healthwallet.infrastructure.persistence.entity.ReceitaEntity;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class ReceitaRepositoryImpl implements ReceitaRepository {
 
     private final ReceitaJpaRepository jpaRepository;
+    private final ItemReceitaJpaRepository itemReceitaJpaRepository;
     private final ReceitaMapper mapper;
 
     @Override
@@ -41,6 +43,13 @@ public class ReceitaRepositoryImpl implements ReceitaRepository {
     public List<Receita> buscarAvulsas() {
         return jpaRepository.findByAgendamentoIsNull().stream()
                 .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ItemReceita> buscarItensUsoContinuoPorPaciente(Long idPaciente) {
+        return itemReceitaJpaRepository.findUsoContinuoPorPaciente(idPaciente).stream()
+                .map(mapper::itemToDomain)
                 .collect(Collectors.toList());
     }
 

@@ -38,6 +38,13 @@ public class DiagnosticoRepositoryImpl implements DiagnosticoRepository {
     }
 
     @Override
+    public List<Diagnostico> buscarCronicosPorPaciente(Long idPaciente) {
+        return jpaRepository.findByAgendamento_Paciente_IdAndDoencaCronicaTrue(idPaciente).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void deletar(Long id) {
         jpaRepository.deleteById(id);
     }
