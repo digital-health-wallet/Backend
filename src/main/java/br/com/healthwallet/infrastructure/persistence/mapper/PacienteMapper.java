@@ -19,6 +19,8 @@ public class PacienteMapper {
         domain.setTipoSanguineo(entity.getTipoSanguineo());
         domain.setCodigoEmergencia(entity.getCodigoEmergencia());
         domain.setFichaEmergencialAtiva(entity.getFichaEmergencialAtiva());
+        domain.setAtivo(entity.getAtivo());
+        domain.setGoogleCalendarId(entity.getGoogleCalendarId());
 
         if (entity.getUsuario() != null) {
             domain.setIdUsuario(entity.getUsuario().getId());
@@ -46,6 +48,8 @@ public class PacienteMapper {
                 .tipoSanguineo(domain.getTipoSanguineo())
                 .codigoEmergencia(domain.getCodigoEmergencia())
                 .fichaEmergencialAtiva(domain.getFichaEmergencialAtiva())
+                .ativo(domain.getAtivo() != null ? domain.getAtivo() : Boolean.TRUE)
+                .googleCalendarId(domain.getGoogleCalendarId())
                 .build();
     }
 }

@@ -39,4 +39,10 @@ public class PacienteEntity {
 
     @Column(name = "ficha_emergencial_ativa", nullable = false)
     private Boolean fichaEmergencialAtiva;
+
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo;
+
+    @Column(name = "google_calendar_id")
+    private String googleCalendarId;
 }

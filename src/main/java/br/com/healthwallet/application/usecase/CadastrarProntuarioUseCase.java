@@ -22,14 +22,15 @@ public class CadastrarProntuarioUseCase {
     }
 
     @Transactional
-    public Paciente executar(CadastroProntuarioRequest request) {
+    public Paciente executar(CadastroProntuarioRequest request, Long idUsuario) {
         Paciente paciente = new Paciente();
-        paciente.setIdUsuario(request.idUsuario());
+        paciente.setIdUsuario(idUsuario);
         paciente.setCpf(request.cpf());
         paciente.setNome(request.nome());
         paciente.setDataNascimento(request.dataNascimento());
         paciente.setTipoSanguineo(request.tipoSanguineo());
         paciente.setFichaEmergencialAtiva(request.fichaEmergencialAtiva());
+        paciente.setAtivo(true);
 
         paciente.setCodigoEmergencia(UUID.randomUUID().toString());
 

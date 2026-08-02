@@ -30,7 +30,12 @@ public class PacienteRepositoryImpl implements PacienteRepository {
 
     @Override
     public List<Paciente> buscarPorUsuario(Long idUsuario) {
-        return jpaRepository.findByUsuarioId(idUsuario).stream().map(mapper::toDomain).collect(Collectors.toList());
+        return jpaRepository.findByUsuarioIdAndAtivoTrue(idUsuario).stream().map(mapper::toDomain).collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Paciente> buscarPorCodigoEmergencia(String codigoEmergencia) {
+        return jpaRepository.findByCodigoEmergencia(codigoEmergencia).map(mapper::toDomain);
     }
 
     @Override

@@ -9,6 +9,7 @@ public interface PacienteRepository {
     List<Paciente> listarTodos();
     Optional<Paciente> buscarPorId(Long id);
     List<Paciente> buscarPorUsuario(Long idUsuario);
+    Optional<Paciente> buscarPorCodigoEmergencia(String codigoEmergencia);
     Paciente salvar(Paciente paciente);
     void deletar(Long id);
 }

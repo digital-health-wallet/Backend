@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-public record CadastroProntuarioRequest(
-        @NotBlank String cpf,
+public record PacienteUpdateRequest(
         @NotBlank String nome,
+        String cpf,
         @NotNull LocalDate dataNascimento,
         String tipoSanguineo,
         @NotNull Boolean fichaEmergencialAtiva,

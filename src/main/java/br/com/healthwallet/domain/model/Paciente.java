@@ -11,6 +11,8 @@ public class Paciente {
     private String tipoSanguineo;
     private String codigoEmergencia;
     private Boolean fichaEmergencialAtiva;
+    private Boolean ativo;
+    private String googleCalendarId;
 
     public Long getId() {
         return id;
@@ -69,5 +71,21 @@ public class Paciente {
 
     public void setFichaEmergencialAtiva(Boolean fichaEmergencialAtiva) {
         this.fichaEmergencialAtiva = fichaEmergencialAtiva;
+    }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public String getGoogleCalendarId() {
+        return googleCalendarId;
+    }
+
+    public void setGoogleCalendarId(String googleCalendarId) {
+        this.googleCalendarId = googleCalendarId;
     }
 }

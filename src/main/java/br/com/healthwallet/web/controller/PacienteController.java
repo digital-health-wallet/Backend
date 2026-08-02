@@ -1,9 +1,13 @@
 package br.com.healthwallet.web.controller;
 
 import br.com.healthwallet.application.usecase.CadastrarProntuarioUseCase;
+import br.com.healthwallet.application.usecase.PacienteComAlergia;
+import br.com.healthwallet.application.usecase.PacienteUseCase;
 import br.com.healthwallet.domain.model.Paciente;
-import br.com.healthwallet.domain.repository.PacienteRepository;
+import br.com.healthwallet.infrastructure.security.AuthenticatedUser;
 import br.com.healthwallet.web.dto.CadastroProntuarioRequest;
+import br.com.healthwallet.web.dto.PacienteResponse;
+import br.com.healthwallet.web.dto.PacienteUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,42 +16,46 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * UC07 - Cadastrar e Gerenciar Perfil de Paciente. Todas as operações são
+ * restritas ao Usuário autenticado (modo cuidador: um Usuário pode gerenciar
+ * vários Pacientes - o próprio e/ou dependentes).
+ */
 @RestController
 @RequestMapping("/api/pacientes")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class PacienteController {
 
     private final CadastrarProntuarioUseCase cadastrarProntuarioUseCase;
-    private final PacienteRepository pacienteRepository;
+    private final PacienteUseCase pacienteUseCase;
 
     @PostMapping("/prontuario")
-    public ResponseEntity<Paciente> salvarProntuarioCompleto(@RequestBody @Valid CadastroProntuarioRequest request) {
-        Paciente pacienteCriado = cadastrarProntuarioUseCase.executar(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteCriado);
+    public ResponseEntity<PacienteResponse> salvarProntuarioCompleto(@RequestBody @Valid CadastroProntuarioRequest request) {
+        Paciente pacienteCriado = cadastrarProntuarioUseCase.executar(request, AuthenticatedUser.idOuFalhar());
+        PacienteComAlergia detalhado = pacienteUseCase.buscarDetalhadoDoUsuario(pacienteCriado.getId(), AuthenticatedUser.idOuFalhar());
+        return ResponseEntity.status(HttpStatus.CREATED).body(PacienteResponse.from(detalhado));
     }
 
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Paciente>> buscarPorUsuario(@PathVariable Long usuarioId) {
-        List<Paciente> pacientes = pacienteRepository.buscarPorUsuario(usuarioId);
-        return ResponseEntity.ok(pacientes);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Paciente>> listarTodos() {
-        return ResponseEntity.ok(pacienteRepository.listarTodos());
+    @GetMapping("/meus")
+    public ResponseEntity<List<Paciente>> listarMeusPacientes() {
+        return ResponseEntity.ok(pacienteUseCase.listarDoUsuario(AuthenticatedUser.idOuFalhar()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> buscarPorId(@PathVariable Long id) {
-        return pacienteRepository.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<PacienteResponse> buscarPorId(@PathVariable Long id) {
+        PacienteComAlergia detalhado = pacienteUseCase.buscarDetalhadoDoUsuario(id, AuthenticatedUser.idOuFalhar());
+        return ResponseEntity.ok(PacienteResponse.from(detalhado));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        pacienteRepository.deletar(id);
+    @PutMapping("/{id}")
+    public ResponseEntity<PacienteResponse> atualizar(@PathVariable Long id, @Valid @RequestBody PacienteUpdateRequest request) {
+        PacienteComAlergia detalhado = pacienteUseCase.atualizar(id, AuthenticatedUser.idOuFalhar(), request);
+        return ResponseEntity.ok(PacienteResponse.from(detalhado));
+    }
+
+    @PatchMapping("/{id}/inativar")
+    public ResponseEntity<Void> inativar(@PathVariable Long id) {
+        pacienteUseCase.inativar(id, AuthenticatedUser.idOuFalhar());
         return ResponseEntity.noContent().build();
     }
 }
