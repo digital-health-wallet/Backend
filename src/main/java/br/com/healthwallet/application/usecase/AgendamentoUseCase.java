@@ -104,6 +104,12 @@ public class AgendamentoUseCase {
         return agendamentoRepository.atualizar(agendamento);
     }
 
+    public Agendamento desarquivar(Long id) {
+        Agendamento agendamento = buscarPorId(id);
+        agendamento.desarquivar();
+        return agendamentoRepository.atualizar(agendamento);
+    }
+
     public Agendamento toggleFavorito(Long id) {
         Agendamento agendamento = buscarPorId(id);
         agendamento.toggleFavorito();

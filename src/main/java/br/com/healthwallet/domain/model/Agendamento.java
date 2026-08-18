@@ -151,6 +151,10 @@ public class Agendamento {
         this.arquivado = true;
     }
 
+    public void desarquivar() {
+        this.arquivado = false;
+    }
+
     public void alterarStatus(StatusAgendamento novoStatus){
         if (this.status == StatusAgendamento.FINALIZADO){
             throw new IllegalStateException("Não é possível alterar o status de uma consulta finalizada.");

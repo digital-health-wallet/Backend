@@ -89,6 +89,11 @@ public class AgendamentoController {
         return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.arquivar(id)));
     }
 
+    @PatchMapping("/{id}/desarquivar")
+    public ResponseEntity<AgendamentoResponse> desarquivar(@PathVariable Long id) {
+        return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.desarquivar(id)));
+    }
+
     @PatchMapping("/{id}/favorito")
     public ResponseEntity<AgendamentoResponse> toggleFavorito(@PathVariable Long id) {
         return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.toggleFavorito(id)));
