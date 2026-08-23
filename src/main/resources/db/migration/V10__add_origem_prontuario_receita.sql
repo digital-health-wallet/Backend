@@ -1,0 +1,1 @@
+ALTER TABLE receitas ADD COLUMN origem_prontuario BOOLEAN DEFAULT FALSE;

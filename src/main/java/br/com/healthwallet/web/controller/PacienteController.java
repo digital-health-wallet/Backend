@@ -58,4 +58,18 @@ public class PacienteController {
         pacienteUseCase.inativar(id, AuthenticatedUser.idOuFalhar());
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/medicamentos-continuos")
+    public ResponseEntity<PacienteResponse> adicionarMedicamentosContinuos(
+            @PathVariable Long id,
+            @RequestBody List<CadastroProntuarioRequest.MedicamentoContinuoRequest> medicamentos) {
+
+        // Garante que o paciente pertence ao usuário autenticado antes de gravar.
+        pacienteUseCase.buscarDoUsuario(id, AuthenticatedUser.idOuFalhar());
+
+        cadastrarProntuarioUseCase.adicionarMedicamentosContinuos(id, medicamentos);
+
+        PacienteComAlergia detalhado = pacienteUseCase.buscarDetalhadoDoUsuario(id, AuthenticatedUser.idOuFalhar());
+        return ResponseEntity.ok(PacienteResponse.from(detalhado));
+    }
 }

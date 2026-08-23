@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record CadastroProntuarioRequest(
         @NotBlank String cpf,
@@ -15,6 +16,11 @@ public record CadastroProntuarioRequest(
 
         @NotNull Boolean possuiAlergia,
         TipoAlergia tipoAlergia,
-        String descricaoAlergia
+        String descricaoAlergia,
+
+        Boolean usaMedicamentoContinuo,
+        List<MedicamentoContinuoRequest> medicamentosContinuos
 ) {
+    public record MedicamentoContinuoRequest(String nome, String posologia) {
+    }
 }

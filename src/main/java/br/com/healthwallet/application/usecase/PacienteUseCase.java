@@ -3,7 +3,9 @@ package br.com.healthwallet.application.usecase;
 import br.com.healthwallet.domain.model.Alergia;
 import br.com.healthwallet.domain.model.Paciente;
 import br.com.healthwallet.domain.repository.AlergiaRepository;
+import br.com.healthwallet.domain.repository.DiagnosticoRepository;
 import br.com.healthwallet.domain.repository.PacienteRepository;
+import br.com.healthwallet.domain.repository.ReceitaRepository;
 import br.com.healthwallet.web.dto.PacienteUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,8 @@ public class PacienteUseCase {
 
     private final PacienteRepository pacienteRepository;
     private final AlergiaRepository alergiaRepository;
+    private final DiagnosticoRepository diagnosticoRepository;
+    private final ReceitaRepository receitaRepository;
 
     public List<Paciente> listarDoUsuario(Long idUsuario) {
         return pacienteRepository.buscarPorUsuario(idUsuario);
@@ -43,7 +47,11 @@ public class PacienteUseCase {
     public PacienteComAlergia buscarDetalhadoDoUsuario(Long idPaciente, Long idUsuario) {
         Paciente paciente = buscarDoUsuario(idPaciente, idUsuario);
         Alergia alergia = buscarAlergiaAtual(idPaciente).orElse(null);
-        return new PacienteComAlergia(paciente, alergia);
+        return new PacienteComAlergia(
+                paciente,
+                alergia,
+                diagnosticoRepository.buscarCronicosPorPaciente(idPaciente),
+                receitaRepository.buscarItensUsoContinuoPorPaciente(idPaciente));
     }
 
     @Transactional
@@ -74,7 +82,11 @@ public class PacienteUseCase {
             alergiaRepository.deletar(alergiaExistente.get().getId());
         }
 
-        return new PacienteComAlergia(atualizado, alergiaAtual);
+        return new PacienteComAlergia(
+                atualizado,
+                alergiaAtual,
+                diagnosticoRepository.buscarCronicosPorPaciente(idPaciente),
+                receitaRepository.buscarItensUsoContinuoPorPaciente(idPaciente));
     }
 
     @Transactional

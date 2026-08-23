@@ -4,6 +4,7 @@ import br.com.healthwallet.application.usecase.PacienteComAlergia;
 import br.com.healthwallet.domain.model.enums.TipoAlergia;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record PacienteResponse(
         Long id,
@@ -16,7 +17,9 @@ public record PacienteResponse(
         String codigoEmergencia,
         Boolean possuiAlergia,
         TipoAlergia tipoAlergia,
-        String descricaoAlergia
+        String descricaoAlergia,
+        List<EmergenciaResponse.DiagnosticoResumo> diagnosticosCronicos,
+        List<EmergenciaResponse.MedicamentoResumo> medicamentosUsoContinuo
 ) {
     public static PacienteResponse from(PacienteComAlergia dados) {
         boolean possuiAlergia = dados.alergia() != null;
@@ -31,7 +34,15 @@ public record PacienteResponse(
                 dados.paciente().getCodigoEmergencia(),
                 possuiAlergia,
                 possuiAlergia ? dados.alergia().getTipo() : null,
-                possuiAlergia ? dados.alergia().getDescricao() : null
+                possuiAlergia ? dados.alergia().getDescricao() : null,
+                dados.diagnosticosCronicos().stream()
+                        .map(d -> new EmergenciaResponse.DiagnosticoResumo(d.getNome(), d.getCid(), d.getDescricao()))
+                        .toList(),
+                dados.medicamentosUsoContinuo().stream()
+                        .map(i -> new EmergenciaResponse.MedicamentoResumo(
+                                i.getMedicamento() != null ? i.getMedicamento().getNomeMedicamento() : null,
+                                i.getPosologia()))
+                        .toList()
         );
     }
 }
