@@ -1,5 +1,6 @@
 package br.com.healthwallet.infrastructure.security;
 
+import br.com.healthwallet.domain.repository.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final UsuarioRepository usuarioRepository;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -31,13 +33,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
+            // Token pode ter assinatura/expiração válidas mas apontar para um usuário que não
+            // existe mais (ex.: banco reiniciado em dev). Nesse caso, não autentica: a rota
+            // protegida responde 401 e o frontend força o logout.
             if (jwtService.tokenValido(token)) {
                 Long idUsuario = jwtService.extrairIdUsuario(token);
 
-                var authentication = new UsernamePasswordAuthenticationToken(
-                        idUsuario, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                if (usuarioRepository.buscarPorId(idUsuario).isPresent()) {
+                    var authentication = new UsernamePasswordAuthenticationToken(
+                            idUsuario, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         }
 
