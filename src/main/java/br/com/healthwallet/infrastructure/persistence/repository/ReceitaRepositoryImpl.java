@@ -35,6 +35,7 @@ public class ReceitaRepositoryImpl implements ReceitaRepository {
     @Override
     public List<Receita> buscarPorAgendamento(Long idAgendamento) {
         return jpaRepository.findByAgendamentoId(idAgendamento).stream()
+                .filter(r -> Boolean.TRUE.equals(r.getAtivo()))
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
@@ -42,13 +43,21 @@ public class ReceitaRepositoryImpl implements ReceitaRepository {
     @Override
     public List<Receita> buscarAvulsas() {
         return jpaRepository.findByAgendamentoIsNull().stream()
+                .filter(r -> Boolean.TRUE.equals(r.getAtivo()))
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Receita> buscarPorPaciente(Long idPaciente) {
+        return jpaRepository.buscarAtivasDoPaciente(idPaciente).stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ItemReceita> buscarItensUsoContinuoPorPaciente(Long idPaciente) {
-        return itemReceitaJpaRepository.findUsoContinuoPorPaciente(idPaciente).stream()
+        return itemReceitaJpaRepository.buscarUsoContinuoDoPaciente(idPaciente).stream()
                 .map(mapper::itemToDomain)
                 .collect(Collectors.toList());
     }
@@ -56,5 +65,13 @@ public class ReceitaRepositoryImpl implements ReceitaRepository {
     @Override
     public void deletar(Long id) {
         jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public void desativar(Long id) {
+        jpaRepository.findById(id).ifPresent(entity -> {
+            entity.setAtivo(false);
+            jpaRepository.save(entity);
+        });
     }
 }

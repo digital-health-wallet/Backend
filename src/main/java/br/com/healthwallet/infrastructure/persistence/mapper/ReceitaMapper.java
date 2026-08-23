@@ -26,6 +26,9 @@ public class ReceitaMapper {
         domain.setId(entity.getId());
         domain.setDataEmissao(entity.getDataEmissao());
         domain.setOrientacoesGerais(entity.getOrientacoesGerais());
+        domain.setOrigemProntuario(entity.getOrigemProntuario());
+        domain.setAtivo(entity.getAtivo());
+        domain.setIdPaciente(entity.getIdPaciente());
 
         if (entity.getAgendamento() != null) {
             domain.setIdAgendamento(entity.getAgendamento().getId());
@@ -59,6 +62,9 @@ public class ReceitaMapper {
                 .agendamento(agendamento)
                 .dataEmissao(domain.getDataEmissao())
                 .orientacoesGerais(domain.getOrientacoesGerais())
+                .origemProntuario(domain.getOrigemProntuario() != null ? domain.getOrigemProntuario() : false)
+                .ativo(domain.getAtivo() != null ? domain.getAtivo() : true)
+                .idPaciente(domain.getIdPaciente())
                 .itens(new ArrayList<>())
                 .uploads(new ArrayList<>())
                 .build();

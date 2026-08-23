@@ -22,6 +22,18 @@ public class ExameController {
         return ResponseEntity.status(HttpStatus.CREATED).body(exameSalvo);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Exame> atualizar(@PathVariable Long id, @RequestBody Exame exame) {
+        exame.setId(id);
+        return ResponseEntity.ok(exameUseCase.salvar(exame));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desativar(@PathVariable Long id) {
+        exameUseCase.desativar(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/agendamento/{idAgendamento}")
     public ResponseEntity<List<Exame>> buscarPorAgendamento(@PathVariable Long idAgendamento) {
         List<Exame> exames = exameUseCase.buscarPorAgendamento(idAgendamento);
@@ -31,6 +43,12 @@ public class ExameController {
     @GetMapping("/avulsos")
     public ResponseEntity<List<Exame>> buscarAvulsos() {
         List<Exame> exames = exameUseCase.buscarAvulsos();
+        return ResponseEntity.ok(exames);
+    }
+
+    @GetMapping("/paciente/{idPaciente}")
+    public ResponseEntity<List<Exame>> buscarPorPaciente(@PathVariable Long idPaciente) {
+        List<Exame> exames = exameUseCase.buscarPorPaciente(idPaciente);
         return ResponseEntity.ok(exames);
     }
 }

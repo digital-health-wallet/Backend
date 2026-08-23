@@ -20,6 +20,8 @@ public class DiagnosticoMapper {
         domain.setCid(entity.getCid());
         domain.setDescricao(entity.getDescricao());
         domain.setDoencaCronica(entity.getDoencaCronica());
+        domain.setAtivo(entity.getAtivo());
+        domain.setIdPaciente(entity.getIdPaciente());
         if (entity.getAgendamento() != null) {
             domain.setIdAgendamento(entity.getAgendamento().getId());
         }
@@ -39,6 +41,8 @@ public class DiagnosticoMapper {
                 .cid(domain.getCid())
                 .descricao(domain.getDescricao())
                 .doencaCronica(domain.getDoencaCronica() != null ? domain.getDoencaCronica() : false)
+                .ativo(domain.getAtivo() != null ? domain.getAtivo() : true)
+                .idPaciente(domain.getIdPaciente())
                 .build();
     }
 }

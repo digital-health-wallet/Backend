@@ -25,6 +25,8 @@ public class ExameMapper {
         domain.setNomeExame(entity.getNomeExame());
         domain.setDataHoraExame(entity.getDataHoraExame());
         domain.setObservacoes(entity.getObservacoes());
+        domain.setAtivo(entity.getAtivo());
+        domain.setIdPaciente(entity.getIdPaciente());
 
         if (entity.getAgendamento() != null) {
             domain.setIdAgendamento(entity.getAgendamento().getId());
@@ -52,6 +54,8 @@ public class ExameMapper {
                 .nomeExame(domain.getNomeExame())
                 .dataHoraExame(domain.getDataHoraExame())
                 .observacoes(domain.getObservacoes())
+                .ativo(domain.getAtivo() != null ? domain.getAtivo() : true)
+                .idPaciente(domain.getIdPaciente())
                 .uploads(new ArrayList<>())
                 .build();
 

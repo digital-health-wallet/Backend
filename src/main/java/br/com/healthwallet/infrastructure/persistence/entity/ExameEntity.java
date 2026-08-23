@@ -25,6 +25,11 @@ public class ExameEntity {
     @JoinColumn(name = "id_agendamento", nullable = true)
     private AgendamentoEntity agendamento;
 
+    // Vínculo direto com o paciente: preenchido sempre, inclusive quando o documento
+    // é avulso (sem agendamento).
+    @Column(name = "id_paciente")
+    private Long idPaciente;
+
     @Column(name = "nome_exame", columnDefinition = "TEXT")
     private String nomeExame;
 
@@ -33,6 +38,10 @@ public class ExameEntity {
 
     @Column(columnDefinition = "TEXT")
     private String observacoes;
+
+    @Builder.Default
+    @Column(name = "ativo")
+    private Boolean ativo = true;
 
     @Builder.Default
     @OneToMany(mappedBy = "exame", cascade = CascadeType.ALL, orphanRemoval = true)

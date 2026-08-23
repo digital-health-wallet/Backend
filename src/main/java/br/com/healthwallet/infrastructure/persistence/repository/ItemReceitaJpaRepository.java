@@ -12,6 +12,6 @@ import java.util.List;
 public interface ItemReceitaJpaRepository extends JpaRepository<ItemReceitaEntity, Long> {
 
     @Query("SELECT i FROM ItemReceitaEntity i " +
-            "WHERE i.receita.agendamento.paciente.id = :idPaciente AND i.usoContinuo = true")
-    List<ItemReceitaEntity> findUsoContinuoPorPaciente(@Param("idPaciente") Long idPaciente);
+            "WHERE i.usoContinuo = true AND i.receita.ativo = true AND i.receita.idPaciente = :idPaciente")
+    List<ItemReceitaEntity> buscarUsoContinuoDoPaciente(@Param("idPaciente") Long idPaciente);
 }

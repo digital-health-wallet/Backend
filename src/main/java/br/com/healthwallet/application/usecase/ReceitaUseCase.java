@@ -2,6 +2,7 @@ package br.com.healthwallet.application.usecase;
 
 import br.com.healthwallet.domain.model.Medicamento;
 import br.com.healthwallet.domain.model.Receita;
+import br.com.healthwallet.domain.repository.AgendamentoRepository;
 import br.com.healthwallet.domain.repository.MedicamentoRepository;
 import br.com.healthwallet.domain.repository.ReceitaRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,18 @@ public class ReceitaUseCase {
 
     private final ReceitaRepository receitaRepository;
     private final MedicamentoRepository medicamentoRepository;
+    private final AgendamentoRepository agendamentoRepository;
 
     public Receita salvar(Receita receita) {
         if (receita.getDataEmissao() == null) {
             receita.setDataEmissao(LocalDateTime.now());
+        }
+
+        // Todo documento precisa ficar vinculado a um paciente, senão apareceria na
+        // ficha de todos os pacientes da conta.
+        if (receita.getIdPaciente() == null && receita.getIdAgendamento() != null) {
+            agendamentoRepository.buscarPorId(receita.getIdAgendamento())
+                    .ifPresent(a -> receita.setIdPaciente(a.getIdPaciente()));
         }
 
         if (receita.getItens() != null) {
@@ -48,5 +57,13 @@ public class ReceitaUseCase {
 
     public List<Receita> buscarAvulsas() {
         return receitaRepository.buscarAvulsas();
+    }
+
+    public List<Receita> buscarPorPaciente(Long idPaciente) {
+        return receitaRepository.buscarPorPaciente(idPaciente);
+    }
+
+    public void desativar(Long id) {
+        receitaRepository.desativar(id);
     }
 }

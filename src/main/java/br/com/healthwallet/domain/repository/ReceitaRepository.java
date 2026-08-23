@@ -10,6 +10,8 @@ public interface ReceitaRepository {
     Optional<Receita> buscarPorId(Long id);
     List<Receita> buscarPorAgendamento(Long idAgendamento);
     List<Receita> buscarAvulsas();
+    List<Receita> buscarPorPaciente(Long idPaciente);
     List<ItemReceita> buscarItensUsoContinuoPorPaciente(Long idPaciente);
     void deletar(Long id);
+    void desativar(Long id);
 }

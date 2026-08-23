@@ -9,5 +9,8 @@ public interface DiagnosticoRepository {
     Optional<Diagnostico> buscarPorId(Long id);
     List<Diagnostico> buscarPorAgendamento(Long idAgendamento);
     List<Diagnostico> buscarCronicosPorPaciente(Long idPaciente);
+    List<Diagnostico> buscarPorPaciente(Long idPaciente);
+    List<Diagnostico> buscarAvulsos();
     void deletar(Long id);
+    void desativar(Long id);
 }

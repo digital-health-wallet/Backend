@@ -6,10 +6,13 @@ import java.util.List;
 public class Receita {
     private Long id;
     private Long idAgendamento; // Pode ser null para receitas avulsas
+    private Long idPaciente;
     private LocalDateTime dataEmissao;
     private String orientacoesGerais;
     private List<ItemReceita> itens;
     private List<Upload> uploads;
+    private Boolean origemProntuario;
+    private Boolean ativo;
 
     public Receita() {}
 
@@ -40,4 +43,13 @@ public class Receita {
 
     public List<Upload> getUploads() { return uploads; }
     public void setUploads(List<Upload> uploads) { this.uploads = uploads; }
+
+    public Boolean getOrigemProntuario() { return origemProntuario; }
+    public void setOrigemProntuario(Boolean origemProntuario) { this.origemProntuario = origemProntuario; }
+
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+
+    public Long getIdPaciente() { return idPaciente; }
+    public void setIdPaciente(Long idPaciente) { this.idPaciente = idPaciente; }
 }

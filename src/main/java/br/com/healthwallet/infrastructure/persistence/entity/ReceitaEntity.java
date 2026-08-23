@@ -25,11 +25,26 @@ public class ReceitaEntity {
     @JoinColumn(name = "id_agendamento", nullable = true)
     private AgendamentoEntity agendamento;
 
+    // Vínculo direto com o paciente: preenchido sempre, inclusive quando a receita
+    // é avulsa (sem agendamento).
+    @Column(name = "id_paciente")
+    private Long idPaciente;
+
     @Column(name = "data_emissao")
     private LocalDateTime dataEmissao;
 
     @Column(name = "orientacoes_gerais", columnDefinition = "TEXT")
     private String orientacoesGerais;
+
+    // Receita criada automaticamente pelo cadastro do prontuário (medicamento de uso
+    // contínuo informado ali) — não deve aparecer na listagem de Documentos.
+    @Builder.Default
+    @Column(name = "origem_prontuario")
+    private Boolean origemProntuario = false;
+
+    @Builder.Default
+    @Column(name = "ativo")
+    private Boolean ativo = true;
 
     @Builder.Default
     @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)

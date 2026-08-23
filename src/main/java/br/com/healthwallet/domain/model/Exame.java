@@ -6,10 +6,12 @@ import java.util.List;
 public class Exame {
     private Long id;
     private Long idAgendamento; // Pode ser null para exames avulsos
+    private Long idPaciente;
     private String nomeExame;
     private LocalDate dataHoraExame;
     private String observacoes;
     private List<Upload> uploads;
+    private Boolean ativo;
 
     public Exame() {}
 
@@ -40,4 +42,10 @@ public class Exame {
 
     public List<Upload> getUploads() { return uploads; }
     public void setUploads(List<Upload> uploads) { this.uploads = uploads; }
+
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+
+    public Long getIdPaciente() { return idPaciente; }
+    public void setIdPaciente(Long idPaciente) { this.idPaciente = idPaciente; }
 }

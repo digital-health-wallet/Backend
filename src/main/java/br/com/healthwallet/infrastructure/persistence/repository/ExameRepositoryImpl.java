@@ -33,6 +33,7 @@ public class ExameRepositoryImpl implements ExameRepository {
     @Override
     public List<Exame> buscarPorAgendamento(Long idAgendamento) {
         return jpaRepository.findByAgendamentoId(idAgendamento).stream()
+                .filter(e -> Boolean.TRUE.equals(e.getAtivo()))
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
@@ -40,6 +41,14 @@ public class ExameRepositoryImpl implements ExameRepository {
     @Override
     public List<Exame> buscarAvulsos() {
         return jpaRepository.findByAgendamentoIsNull().stream()
+                .filter(e -> Boolean.TRUE.equals(e.getAtivo()))
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Exame> buscarPorPaciente(Long idPaciente) {
+        return jpaRepository.buscarAtivosDoPaciente(idPaciente).stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
@@ -47,5 +56,13 @@ public class ExameRepositoryImpl implements ExameRepository {
     @Override
     public void deletar(Long id) {
         jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public void desativar(Long id) {
+        jpaRepository.findById(id).ifPresent(entity -> {
+            entity.setAtivo(false);
+            jpaRepository.save(entity);
+        });
     }
 }

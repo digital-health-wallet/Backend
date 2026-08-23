@@ -33,13 +33,29 @@ public class DiagnosticoRepositoryImpl implements DiagnosticoRepository {
     @Override
     public List<Diagnostico> buscarPorAgendamento(Long idAgendamento) {
         return jpaRepository.findByAgendamentoId(idAgendamento).stream()
+                .filter(d -> Boolean.TRUE.equals(d.getAtivo()))
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Diagnostico> buscarCronicosPorPaciente(Long idPaciente) {
-        return jpaRepository.findByAgendamento_Paciente_IdAndDoencaCronicaTrue(idPaciente).stream()
+        return jpaRepository.buscarCronicosAtivosDoPaciente(idPaciente).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Diagnostico> buscarPorPaciente(Long idPaciente) {
+        return jpaRepository.buscarAtivosDoPaciente(idPaciente).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Diagnostico> buscarAvulsos() {
+        return jpaRepository.findByAgendamentoIsNull().stream()
+                .filter(d -> Boolean.TRUE.equals(d.getAtivo()))
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
@@ -47,5 +63,13 @@ public class DiagnosticoRepositoryImpl implements DiagnosticoRepository {
     @Override
     public void deletar(Long id) {
         jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public void desativar(Long id) {
+        jpaRepository.findById(id).ifPresent(entity -> {
+            entity.setAtivo(false);
+            jpaRepository.save(entity);
+        });
     }
 }

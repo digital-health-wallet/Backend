@@ -22,9 +22,27 @@ public class DiagnosticoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(diagnosticoSalvo);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Diagnostico> atualizar(@PathVariable Long id, @RequestBody Diagnostico diagnostico) {
+        diagnostico.setId(id);
+        return ResponseEntity.ok(diagnosticoUseCase.salvar(diagnostico));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desativar(@PathVariable Long id) {
+        diagnosticoUseCase.desativar(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/agendamento/{idAgendamento}")
     public ResponseEntity<List<Diagnostico>> buscarPorAgendamento(@PathVariable Long idAgendamento) {
         List<Diagnostico> diagnosticos = diagnosticoUseCase.buscarPorAgendamento(idAgendamento);
+        return ResponseEntity.ok(diagnosticos);
+    }
+
+    @GetMapping("/paciente/{idPaciente}")
+    public ResponseEntity<List<Diagnostico>> buscarPorPaciente(@PathVariable Long idPaciente) {
+        List<Diagnostico> diagnosticos = diagnosticoUseCase.buscarPorPaciente(idPaciente);
         return ResponseEntity.ok(diagnosticos);
     }
 }
