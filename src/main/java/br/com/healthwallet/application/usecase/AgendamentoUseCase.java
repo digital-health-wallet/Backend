@@ -1,5 +1,6 @@
 package br.com.healthwallet.application.usecase;
 
+import br.com.healthwallet.domain.exception.ConflitoAgendamentoException;
 import br.com.healthwallet.domain.model.Agendamento;
 import br.com.healthwallet.domain.model.Profissional;
 import br.com.healthwallet.domain.model.enums.StatusAgendamento;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,8 @@ public class AgendamentoUseCase {
     private final GoogleTokenUseCase googleTokenUseCase;
 
     public ResultadoAgendamento criar(Agendamento agendamento, boolean sincronizarGoogle, Long idUsuario) {
+        exigirHorarioLivre(agendamento, null);
+
         if (agendamento.getIdProfissional() == null && agendamento.getProfissional() != null) {
 
             Optional<Profissional> existente = profissionalRepository
@@ -60,6 +64,53 @@ public class AgendamentoUseCase {
             log.warn("Falha ao sincronizar agendamento {} com o Google Calendar: {}", salvo.getId(), e.getMessage());
             return new ResultadoAgendamento(salvo, "Consulta salva, mas não foi possível sincronizar com o Google Calendar: " + e.getMessage());
         }
+    }
+
+    /**
+     * UC03 - Fluxo de Exceção: bloqueia o cadastro quando o paciente já tem consulta
+     * no mesmo intervalo. Consultas canceladas não ocupam horário. Quando a hora de
+     * término não foi informada, considera-se a duração padrão de uma hora.
+     *
+     * @param idIgnorado id do próprio agendamento em caso de reagendamento, para que
+     *                   ele não conflite consigo mesmo.
+     */
+    private void exigirHorarioLivre(Agendamento novo, Long idIgnorado) {
+        if (novo.getIdPaciente() == null || novo.getDataAgendamento() == null
+                || novo.getHoraAgendamento() == null) {
+            return;
+        }
+
+        boolean conflita = agendamentoRepository
+                .buscarPorPacienteEData(novo.getIdPaciente(), novo.getDataAgendamento())
+                .stream()
+                .filter(existente -> !existente.getId().equals(idIgnorado))
+                .filter(existente -> existente.getStatus() != StatusAgendamento.CANCELADO)
+                .anyMatch(existente -> seSobrepoem(novo, existente));
+
+        if (conflita) {
+            throw new ConflitoAgendamentoException(
+                    "Este paciente já possui uma consulta neste horário. Escolha outro horário para evitar choque de agendas.");
+        }
+    }
+
+    private boolean seSobrepoem(Agendamento novo, Agendamento existente) {
+        if (existente.getHoraAgendamento() == null) {
+            return false;
+        }
+
+        LocalTime inicioNovo = novo.getHoraAgendamento();
+        LocalTime fimNovo = fimDe(novo);
+        LocalTime inicioExistente = existente.getHoraAgendamento();
+        LocalTime fimExistente = fimDe(existente);
+
+        return inicioNovo.isBefore(fimExistente) && inicioExistente.isBefore(fimNovo);
+    }
+
+    private LocalTime fimDe(Agendamento agendamento) {
+        LocalTime fim = agendamento.getHoraFim();
+        return fim != null && fim.isAfter(agendamento.getHoraAgendamento())
+                ? fim
+                : agendamento.getHoraAgendamento().plusHours(1);
     }
 
     public Agendamento buscarPorId(Long id) {
@@ -118,6 +169,9 @@ public class AgendamentoUseCase {
 
     public ResultadoAgendamento atualizar(Long id, Agendamento dados, Long idUsuario) {
         Agendamento agendamento = buscarPorId(id);
+        dados.setIdPaciente(agendamento.getIdPaciente());
+        exigirHorarioLivre(dados, id);
+
         agendamento.setEspecialidade(dados.getEspecialidade());
         agendamento.setNomeClinica(dados.getNomeClinica());
         agendamento.setMotivoConsulta(dados.getMotivoConsulta());

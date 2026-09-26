@@ -5,6 +5,7 @@ import br.com.healthwallet.application.usecase.AgendamentoUseCase;
 import br.com.healthwallet.application.usecase.GoogleTokenUseCase;
 import br.com.healthwallet.application.usecase.ResultadoAgendamento;
 import br.com.healthwallet.application.usecase.SincronizarAgendaUseCase;
+import br.com.healthwallet.domain.exception.ConflitoAgendamentoException;
 import br.com.healthwallet.domain.model.Agendamento;
 import br.com.healthwallet.domain.model.Endereco;
 import br.com.healthwallet.domain.model.Profissional;
@@ -12,6 +13,7 @@ import br.com.healthwallet.domain.model.enums.StatusAgendamento;
 import br.com.healthwallet.infrastructure.security.AuthenticatedUser;
 import br.com.healthwallet.web.dto.AgendamentoRequest;
 import br.com.healthwallet.web.dto.AgendamentoResponse;
+import br.com.healthwallet.web.dto.ErroResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -103,6 +105,16 @@ public class AgendamentoController {
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         agendamentoUseCase.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * UC03 e UC04 - Fluxos de Exceção: choque de agendas e tentativa de alterar
+     * consulta finalizada devolvem 409 com a mensagem, para que a interface possa
+     * exibi-la em vez de falhar silenciosamente.
+     */
+    @ExceptionHandler({ConflitoAgendamentoException.class, IllegalStateException.class})
+    public ResponseEntity<ErroResponse> tratarConflito(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErroResponse(e.getMessage()));
     }
 
     private Agendamento toModel(AgendamentoRequest request) {

@@ -6,6 +6,7 @@ import br.com.healthwallet.infrastructure.persistence.mapper.AgendamentoMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,11 @@ public class AgendamentoRepositoryImpl implements AgendamentoRepository {
     @Override
     public List<Agendamento> buscarArquivadosPorPaciente(Long idPaciente) {
         return jpa.findByPacienteIdAndArquivadoTrue(idPaciente).stream().map(mapper::toDomain).toList();
+    }
+
+    @Override
+    public List<Agendamento> buscarPorPacienteEData(Long idPaciente, LocalDate data) {
+        return jpa.findByPacienteIdAndDataAgendamento(idPaciente, data).stream().map(mapper::toDomain).toList();
     }
 
     @Override
