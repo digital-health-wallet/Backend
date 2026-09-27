@@ -103,6 +103,7 @@ class AgendamentoUseCaseTest {
     @DisplayName("Arquivar e desarquivar alternam a flag do agendamento")
     void deveArquivarEDesarquivar() {
         Agendamento agendamento = novoAgendamento();
+        agendamento.setStatus(StatusAgendamento.FINALIZADO);
         agendamento.setArquivado(false);
         when(agendamentoRepository.buscarPorId(10L)).thenReturn(Optional.of(agendamento));
         when(agendamentoRepository.atualizar(any())).thenAnswer(chamada -> chamada.getArgument(0));
@@ -262,5 +263,31 @@ class AgendamentoUseCaseTest {
                 .hasMessageContaining("finalizada");
 
         verify(agendamentoRepository, never()).atualizar(any());
+    }
+
+    @Test
+    @DisplayName("Consulta em aberto não pode ser arquivada")
+    void naoArquivaConsultaEmAberto() {
+        Agendamento agendamento = novoAgendamento();
+        agendamento.setStatus(StatusAgendamento.AGENDADO);
+        when(agendamentoRepository.buscarPorId(10L)).thenReturn(Optional.of(agendamento));
+
+        assertThatThrownBy(() -> agendamentoUseCase.arquivar(10L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("finalizadas ou canceladas");
+
+        verify(agendamentoRepository, never()).atualizar(any());
+    }
+
+    @Test
+    @DisplayName("Consulta cancelada pode ser arquivada")
+    void arquivaConsultaCancelada() {
+        Agendamento agendamento = novoAgendamento();
+        agendamento.setStatus(StatusAgendamento.CANCELADO);
+        agendamento.setArquivado(false);
+        when(agendamentoRepository.buscarPorId(10L)).thenReturn(Optional.of(agendamento));
+        when(agendamentoRepository.atualizar(any())).thenAnswer(chamada -> chamada.getArgument(0));
+
+        assertThat(agendamentoUseCase.arquivar(10L).getArquivado()).isTrue();
     }
 }

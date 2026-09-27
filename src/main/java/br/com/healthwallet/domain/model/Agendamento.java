@@ -147,7 +147,15 @@ public class Agendamento {
         this.googleEventId = googleEventId;
     }
 
+    /**
+     * UC04 - Fluxo Alternativo 2: só consultas finalizadas ou canceladas saem da
+     * listagem principal. Arquivar uma consulta em aberto a esconderia do usuário.
+     */
     public void arquivar() {
+        if (this.status != StatusAgendamento.FINALIZADO && this.status != StatusAgendamento.CANCELADO) {
+            throw new IllegalStateException(
+                    "Só é possível arquivar consultas finalizadas ou canceladas.");
+        }
         this.arquivado = true;
     }
 
