@@ -211,4 +211,56 @@ class AgendamentoUseCaseTest {
 
         verify(agendamentoRepository, never()).atualizar(any());
     }
+
+    @Test
+    @DisplayName("Alterar data ou horário marca a consulta como REAGENDADO")
+    void reagendarMudaOStatus() {
+        Agendamento existente = agendamentoEm(10L, "09:00", "10:00");
+        existente.setStatus(StatusAgendamento.CONFIRMADO);
+
+        Agendamento dados = agendamentoEm(null, "11:00", "12:00");
+
+        when(agendamentoRepository.buscarPorId(10L)).thenReturn(Optional.of(existente));
+        when(agendamentoRepository.buscarPorPacienteEData(1L, dados.getDataAgendamento()))
+                .thenReturn(List.of(existente));
+        when(agendamentoRepository.atualizar(any())).thenAnswer(chamada -> chamada.getArgument(0));
+
+        ResultadoAgendamento resultado = agendamentoUseCase.atualizar(10L, dados, 1L);
+
+        assertThat(resultado.agendamento().getStatus()).isEqualTo(StatusAgendamento.REAGENDADO);
+    }
+
+    @Test
+    @DisplayName("Editar sem mexer em data e horário preserva o status")
+    void edicaoSemMudarHorarioNaoReagenda() {
+        Agendamento existente = agendamentoEm(10L, "09:00", "10:00");
+        existente.setStatus(StatusAgendamento.CONFIRMADO);
+
+        Agendamento dados = agendamentoEm(null, "09:00", "10:00");
+        dados.setMotivoConsulta("Consulta de rotina");
+
+        when(agendamentoRepository.buscarPorId(10L)).thenReturn(Optional.of(existente));
+        when(agendamentoRepository.buscarPorPacienteEData(1L, dados.getDataAgendamento()))
+                .thenReturn(List.of(existente));
+        when(agendamentoRepository.atualizar(any())).thenAnswer(chamada -> chamada.getArgument(0));
+
+        ResultadoAgendamento resultado = agendamentoUseCase.atualizar(10L, dados, 1L);
+
+        assertThat(resultado.agendamento().getStatus()).isEqualTo(StatusAgendamento.CONFIRMADO);
+    }
+
+    @Test
+    @DisplayName("Consulta finalizada não pode ser reagendada")
+    void finalizadaNaoPodeSerReagendada() {
+        Agendamento existente = agendamentoEm(10L, "09:00", "10:00");
+        existente.setStatus(StatusAgendamento.FINALIZADO);
+
+        when(agendamentoRepository.buscarPorId(10L)).thenReturn(Optional.of(existente));
+
+        assertThatThrownBy(() -> agendamentoUseCase.atualizar(10L, agendamentoEm(null, "11:00", "12:00"), 1L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("finalizada");
+
+        verify(agendamentoRepository, never()).atualizar(any());
+    }
 }

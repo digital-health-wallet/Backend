@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -106,6 +107,12 @@ public class AgendamentoUseCase {
         return inicioNovo.isBefore(fimExistente) && inicioExistente.isBefore(fimNovo);
     }
 
+    private boolean houveMudancaDeHorario(Agendamento atual, Agendamento dados) {
+        return !Objects.equals(atual.getDataAgendamento(), dados.getDataAgendamento())
+                || !Objects.equals(atual.getHoraAgendamento(), dados.getHoraAgendamento())
+                || !Objects.equals(atual.getHoraFim(), dados.getHoraFim());
+    }
+
     private LocalTime fimDe(Agendamento agendamento) {
         LocalTime fim = agendamento.getHoraFim();
         return fim != null && fim.isAfter(agendamento.getHoraAgendamento())
@@ -169,8 +176,16 @@ public class AgendamentoUseCase {
 
     public ResultadoAgendamento atualizar(Long id, Agendamento dados, Long idUsuario) {
         Agendamento agendamento = buscarPorId(id);
+
+        // UC04 - Fluxo de Exceção: consulta finalizada não pode ser reagendada.
+        if (agendamento.getStatus() == StatusAgendamento.FINALIZADO) {
+            throw new IllegalStateException("Não é possível reagendar uma consulta finalizada.");
+        }
+
         dados.setIdPaciente(agendamento.getIdPaciente());
         exigirHorarioLivre(dados, id);
+
+        boolean mudouHorario = houveMudancaDeHorario(agendamento, dados);
 
         agendamento.setEspecialidade(dados.getEspecialidade());
         agendamento.setNomeClinica(dados.getNomeClinica());
@@ -179,6 +194,12 @@ public class AgendamentoUseCase {
         agendamento.setDataAgendamento(dados.getDataAgendamento());
         agendamento.setHoraAgendamento(dados.getHoraAgendamento());
         agendamento.setHoraFim(dados.getHoraFim());
+
+        // RF05 - alterar data ou horário caracteriza reagendamento, e o status passa a
+        // refletir isso. Consulta cancelada permanece cancelada.
+        if (mudouHorario && agendamento.getStatus() != StatusAgendamento.CANCELADO) {
+            agendamento.setStatus(StatusAgendamento.REAGENDADO);
+        }
 
         String aviso = null;
 
