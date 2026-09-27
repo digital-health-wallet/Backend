@@ -63,11 +63,6 @@ public class ReceitaRepositoryImpl implements ReceitaRepository {
     }
 
     @Override
-    public void deletar(Long id) {
-        jpaRepository.deleteById(id);
-    }
-
-    @Override
     public void desativar(Long id) {
         jpaRepository.findById(id).ifPresent(entity -> {
             entity.setAtivo(false);

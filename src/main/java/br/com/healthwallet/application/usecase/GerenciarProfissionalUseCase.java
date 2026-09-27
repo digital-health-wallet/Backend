@@ -25,12 +25,6 @@ public class GerenciarProfissionalUseCase {
     }
 
     @Transactional
-    public void deletar(Long id) {
-        buscarPorId(id);
-        profissionalRepository.deletar(id);
-    }
-
-    @Transactional
     public Profissional salvarOuAtualizar(Profissional profissional) {
         if (profissional.getId() != null) {
             Profissional existente = profissionalRepository.buscarPorId(profissional.getId())

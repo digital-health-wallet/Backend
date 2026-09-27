@@ -24,12 +24,6 @@ public class GerenciarContatoUseCase {
     }
 
     @Transactional
-    public void deletar(Long id) {
-        buscarPorId(id);
-        contatoRepository.deletar(id);
-    }
-
-    @Transactional
     public Contato salvarOuAtualizar(Contato contato) {
         if (contato.getId() != null) {
             Contato existente = buscarPorId(contato.getId());

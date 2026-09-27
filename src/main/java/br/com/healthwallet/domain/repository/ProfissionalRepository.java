@@ -10,5 +10,4 @@ public interface ProfissionalRepository {
     Optional<Profissional> buscarPorId(Long id);
     Optional<Profissional> buscarPorNome(String nomeProfissional);
     Profissional salvar(Profissional profissional);
-    void deletar(Long id);
 }

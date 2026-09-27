@@ -198,8 +198,4 @@ public class AgendamentoUseCase {
         return new ResultadoAgendamento(agendamentoRepository.atualizar(agendamento), aviso);
     }
 
-    public void deletar(Long id) {
-        buscarPorId(id);
-        agendamentoRepository.deletar(id);
-    }
 }

@@ -38,8 +38,4 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository{
         return mapper.toDomain(jpaRepository.save(entity));
     }
 
-    @Override
-    public void deletar(Long id) {
-        jpaRepository.deleteById(id);
-    }
 }

@@ -9,5 +9,4 @@ public interface ContatoRepository {
     List<Contato> listarTodos();
     Optional<Contato> buscarPorId(Long id);
     Contato salvar(Contato contato);
-    void deletar(Long id);
 }

@@ -14,5 +14,4 @@ public interface AgendamentoRepository {
     List<Agendamento> buscarArquivadosPorPaciente(Long idPaciente);
     List<Agendamento> buscarPorPacienteEData(Long idPaciente, LocalDate data);
     Agendamento atualizar(Agendamento agendamento);
-    void deletar(Long id);
 }

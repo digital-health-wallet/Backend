@@ -195,7 +195,6 @@ class AgendamentoUseCaseTest {
 
         assertThat(resultado.agendamento().getStatus()).isEqualTo(StatusAgendamento.CANCELADO);
         verify(agendamentoRepository).atualizar(any());
-        verify(agendamentoRepository, never()).deletar(anyLong());
     }
 
     @Test

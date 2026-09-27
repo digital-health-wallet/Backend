@@ -11,6 +11,5 @@ public interface DiagnosticoRepository {
     List<Diagnostico> buscarCronicosPorPaciente(Long idPaciente);
     List<Diagnostico> buscarPorPaciente(Long idPaciente);
     List<Diagnostico> buscarAvulsos();
-    void deletar(Long id);
     void desativar(Long id);
 }

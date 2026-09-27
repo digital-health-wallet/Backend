@@ -1,6 +1,5 @@
 package br.com.healthwallet.web.controller;
 
-
 import br.com.healthwallet.application.usecase.AgendamentoUseCase;
 import br.com.healthwallet.application.usecase.GoogleTokenUseCase;
 import br.com.healthwallet.application.usecase.ResultadoAgendamento;
@@ -101,12 +100,6 @@ public class AgendamentoController {
         return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.toggleFavorito(id)));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        agendamentoUseCase.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
-
     /**
      * UC03 e UC04 - Fluxos de Exceção: choque de agendas e tentativa de alterar
      * consulta finalizada devolvem 409 com a mensagem, para que a interface possa
@@ -152,7 +145,6 @@ public class AgendamentoController {
 
             agendamento.setProfissional(profissional);
         }
-
 
         return agendamento;
     }

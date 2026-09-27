@@ -52,9 +52,4 @@ public class AgendamentoRepositoryImpl implements AgendamentoRepository {
         return mapper.toDomain(jpa.save(mapper.toEntity(agendamento)));
     }
 
-    @Override
-    public void deletar(Long id) {
-        jpa.deleteById(id);
-    }
-
 }

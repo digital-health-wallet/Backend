@@ -46,12 +46,6 @@ public class ProfissionalController {
                 profissionalUseCase.salvarOuAtualizar(profissional)));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        profissionalUseCase.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
-
     private Profissional toModel(ProfissionalRequest request) {
         Profissional profissional = new Profissional();
         profissional.setNomeProfissional(request.nomeProfissional());

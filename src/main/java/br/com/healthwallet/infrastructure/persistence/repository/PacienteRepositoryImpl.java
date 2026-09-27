@@ -44,8 +44,4 @@ public class PacienteRepositoryImpl implements PacienteRepository {
         return mapper.toDomain(jpaRepository.save(entity));
     }
 
-    @Override
-    public void deletar(Long id) {
-        jpaRepository.deleteById(id);
-    }
 }

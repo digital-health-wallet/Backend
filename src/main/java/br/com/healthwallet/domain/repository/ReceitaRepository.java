@@ -12,6 +12,5 @@ public interface ReceitaRepository {
     List<Receita> buscarAvulsas();
     List<Receita> buscarPorPaciente(Long idPaciente);
     List<ItemReceita> buscarItensUsoContinuoPorPaciente(Long idPaciente);
-    void deletar(Long id);
     void desativar(Long id);
 }

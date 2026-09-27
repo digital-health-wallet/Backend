@@ -45,12 +45,6 @@ public class ContatoController {
                 contatoUseCase.salvarOuAtualizar(contato)));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        contatoUseCase.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
-
     private Contato toModel(ContatoRequest request) {
         Contato contato = new Contato();
         contato.setNome(request.nome());

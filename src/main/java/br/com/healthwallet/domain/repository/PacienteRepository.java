@@ -11,5 +11,4 @@ public interface PacienteRepository {
     List<Paciente> buscarPorUsuario(Long idUsuario);
     Optional<Paciente> buscarPorCodigoEmergencia(String codigoEmergencia);
     Paciente salvar(Paciente paciente);
-    void deletar(Long id);
 }
