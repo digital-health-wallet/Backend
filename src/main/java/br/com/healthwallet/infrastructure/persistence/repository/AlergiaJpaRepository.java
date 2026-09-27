@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface AlergiaJpaRepository extends JpaRepository <AlergiaEntity, Long> {
-    List<AlergiaEntity> findByPacienteId(Long idPaciente);
+    List<AlergiaEntity> findByPacienteIdAndAtivoTrue(Long idPaciente);
 }

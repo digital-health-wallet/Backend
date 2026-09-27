@@ -10,5 +10,5 @@ public interface AlergiaRepository {
     Optional<Alergia> buscarPorId(Long id);
     List<Alergia> buscarPorPaciente(Long idPaciente);
     Alergia salvar(Alergia alergia);
-    void deletar(Long id);
+    void desativar(Long id);
 }

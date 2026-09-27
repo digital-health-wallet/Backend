@@ -6,13 +6,17 @@ import br.com.healthwallet.domain.repository.AlergiaRepository;
 import br.com.healthwallet.domain.repository.DiagnosticoRepository;
 import br.com.healthwallet.domain.repository.PacienteRepository;
 import br.com.healthwallet.domain.repository.ReceitaRepository;
+import br.com.healthwallet.web.dto.AlergiaRequest;
 import br.com.healthwallet.web.dto.PacienteUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * UC07 - Cadastrar e Gerenciar Perfil de Paciente: leitura, edição e
@@ -41,15 +45,14 @@ public class PacienteUseCase {
     }
 
     /**
-     * Inclui a alergia atualmente cadastrada (se houver), para telas como
-     * "Gerenciar Paciente" conseguirem exibir/editar sem uma segunda chamada.
+     * Inclui as alergias cadastradas, para telas como "Gerenciar Paciente"
+     * conseguirem exibir/editar sem uma segunda chamada.
      */
     public PacienteComAlergia buscarDetalhadoDoUsuario(Long idPaciente, Long idUsuario) {
         Paciente paciente = buscarDoUsuario(idPaciente, idUsuario);
-        Alergia alergia = buscarAlergiaAtual(idPaciente).orElse(null);
         return new PacienteComAlergia(
                 paciente,
-                alergia,
+                alergiaRepository.buscarPorPaciente(idPaciente),
                 diagnosticoRepository.buscarCronicosPorPaciente(idPaciente),
                 receitaRepository.buscarItensUsoContinuoPorPaciente(idPaciente));
     }
@@ -67,26 +70,48 @@ public class PacienteUseCase {
         paciente.setFichaEmergencialAtiva(dados.fichaEmergencialAtiva());
 
         Paciente atualizado = pacienteRepository.salvar(paciente);
-        Optional<Alergia> alergiaExistente = buscarAlergiaAtual(idPaciente);
 
-        Alergia alergiaAtual = null;
-        if (Boolean.TRUE.equals(dados.possuiAlergia())) {
-            Alergia alergia = alergiaExistente.orElseGet(Alergia::new);
-            alergia.setIdPaciente(idPaciente);
-            alergia.setTipo(dados.tipoAlergia());
-            alergia.setDescricao(dados.descricaoAlergia());
-            alergiaAtual = alergiaRepository.salvar(alergia);
-        } else if (alergiaExistente.isPresent()) {
-            // possuiAlergia=false: o paciente não tem mais alergia -> apaga o registro existente
-            // em vez de simplesmente ignorar (senão a alergia antiga nunca some).
-            alergiaRepository.deletar(alergiaExistente.get().getId());
-        }
+        List<Alergia> informadas = Boolean.TRUE.equals(dados.possuiAlergia())
+                ? sincronizarAlergias(idPaciente, dados.alergias())
+                : sincronizarAlergias(idPaciente, List.of());
 
         return new PacienteComAlergia(
                 atualizado,
-                alergiaAtual,
+                informadas,
                 diagnosticoRepository.buscarCronicosPorPaciente(idPaciente),
                 receitaRepository.buscarItensUsoContinuoPorPaciente(idPaciente));
+    }
+
+    /**
+     * RF10 - reconcilia o histórico de alergias do paciente: grava as informadas e
+     * desativa as que foram removidas na tela. A desativação preserva o registro,
+     * conforme a política de exclusão lógica adotada para dado clínico.
+     */
+    private List<Alergia> sincronizarAlergias(Long idPaciente, List<AlergiaRequest> informadas) {
+        List<Alergia> existentes = alergiaRepository.buscarPorPaciente(idPaciente);
+        List<AlergiaRequest> recebidas = informadas != null ? informadas : List.of();
+
+        Set<Long> idsMantidos = recebidas.stream()
+                .map(AlergiaRequest::id)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        existentes.stream()
+                .filter(existente -> !idsMantidos.contains(existente.getId()))
+                .forEach(removida -> alergiaRepository.desativar(removida.getId()));
+
+        return recebidas.stream()
+                .filter(recebida -> recebida.descricao() != null && !recebida.descricao().isBlank())
+                .map(recebida -> {
+                    Alergia alergia = new Alergia();
+                    alergia.setId(recebida.id());
+                    alergia.setIdPaciente(idPaciente);
+                    alergia.setTipo(recebida.tipo());
+                    alergia.setDescricao(recebida.descricao());
+                    alergia.setAtivo(true);
+                    return alergiaRepository.salvar(alergia);
+                })
+                .toList();
     }
 
     @Transactional
@@ -95,10 +120,6 @@ public class PacienteUseCase {
         paciente.setAtivo(false);
         paciente.setFichaEmergencialAtiva(false);
         pacienteRepository.salvar(paciente);
-    }
-
-    private Optional<Alergia> buscarAlergiaAtual(Long idPaciente) {
-        return alergiaRepository.buscarPorPaciente(idPaciente).stream().findFirst();
     }
 
     private void exigirPropriedade(Paciente paciente, Long idUsuario) {

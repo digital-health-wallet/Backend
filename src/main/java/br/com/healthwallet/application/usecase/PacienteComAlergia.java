@@ -8,11 +8,12 @@ import br.com.healthwallet.domain.model.Paciente;
 import java.util.List;
 
 /**
- * @param alergia null quando o paciente não tem alergia cadastrada.
+ * @param alergias RF10 - o paciente pode ter várias alergias registradas; lista vazia
+ *                 quando nenhuma foi informada.
  */
 public record PacienteComAlergia(
         Paciente paciente,
-        Alergia alergia,
+        List<Alergia> alergias,
         List<Diagnostico> diagnosticosCronicos,
         List<ItemReceita> medicamentosUsoContinuo
 ) {

@@ -16,13 +16,17 @@ public record PacienteResponse(
         Boolean ativo,
         String codigoEmergencia,
         Boolean possuiAlergia,
-        TipoAlergia tipoAlergia,
-        String descricaoAlergia,
+        List<AlergiaResumo> alergias,
         List<EmergenciaResponse.DiagnosticoResumo> diagnosticosCronicos,
         List<EmergenciaResponse.MedicamentoResumo> medicamentosUsoContinuo
 ) {
+    public record AlergiaResumo(Long id, TipoAlergia tipo, String descricao) {
+    }
+
     public static PacienteResponse from(PacienteComAlergia dados) {
-        boolean possuiAlergia = dados.alergia() != null;
+        List<AlergiaResumo> alergias = dados.alergias().stream()
+                .map(a -> new AlergiaResumo(a.getId(), a.getTipo(), a.getDescricao()))
+                .toList();
         return new PacienteResponse(
                 dados.paciente().getId(),
                 dados.paciente().getNome(),
@@ -32,9 +36,8 @@ public record PacienteResponse(
                 dados.paciente().getFichaEmergencialAtiva(),
                 dados.paciente().getAtivo(),
                 dados.paciente().getCodigoEmergencia(),
-                possuiAlergia,
-                possuiAlergia ? dados.alergia().getTipo() : null,
-                possuiAlergia ? dados.alergia().getDescricao() : null,
+                !alergias.isEmpty(),
+                alergias,
                 dados.diagnosticosCronicos().stream()
                         .map(d -> new EmergenciaResponse.DiagnosticoResumo(d.getNome(), d.getCid(), d.getDescricao()))
                         .toList(),

@@ -14,6 +14,7 @@ public class AlergiaMapper {
         domain.setId(entity.getId());
         domain.setTipo(entity.getTipo());
         domain.setDescricao(entity.getDescricao());
+        domain.setAtivo(entity.getAtivo());
 
         if (entity.getPaciente() != null) {
             domain.setIdPaciente(entity.getPaciente().getId());
@@ -37,6 +38,7 @@ public class AlergiaMapper {
                 .paciente(pacienteEntity)
                 .tipo(domain.getTipo())
                 .descricao(domain.getDescricao())
+                .ativo(domain.getAtivo() != null ? domain.getAtivo() : true)
                 .build();
     }
 

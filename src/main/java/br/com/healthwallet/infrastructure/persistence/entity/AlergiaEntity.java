@@ -34,4 +34,8 @@ public class AlergiaEntity {
 
     @Column(name = "descricao", length = 50)
     private String descricao;
+
+    @Builder.Default
+    @Column(name = "ativo")
+    private Boolean ativo = true;
 }

@@ -1,6 +1,5 @@
 package br.com.healthwallet.web.dto;
 
-import br.com.healthwallet.domain.model.enums.TipoAlergia;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -15,8 +14,7 @@ public record CadastroProntuarioRequest(
         @NotNull Boolean fichaEmergencialAtiva,
 
         @NotNull Boolean possuiAlergia,
-        TipoAlergia tipoAlergia,
-        String descricaoAlergia,
+        List<AlergiaRequest> alergias,
 
         Boolean usaMedicamentoContinuo,
         List<MedicamentoContinuoRequest> medicamentosContinuos

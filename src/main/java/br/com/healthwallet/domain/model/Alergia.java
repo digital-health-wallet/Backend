@@ -8,6 +8,7 @@ public class Alergia {
     private Long idMedicamento; // Referência ao medicamento (opcional/futuro)
     private TipoAlergia tipo;
     private String descricao;
+    private Boolean ativo = true;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -23,4 +24,7 @@ public class Alergia {
 
     public String getDescricao() { return descricao; }
     public void setDescricao(String descricao) { this.descricao = descricao; }
+
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
 }

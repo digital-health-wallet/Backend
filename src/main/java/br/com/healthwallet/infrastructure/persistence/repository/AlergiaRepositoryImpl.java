@@ -29,7 +29,7 @@ public class AlergiaRepositoryImpl implements AlergiaRepository {
 
     @Override
     public List<Alergia> buscarPorPaciente(Long idPaciente) {
-        return jpaRepository.findByPacienteId(idPaciente).stream().map(mapper::toDomain).collect(Collectors.toList());
+        return jpaRepository.findByPacienteIdAndAtivoTrue(idPaciente).stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
@@ -39,7 +39,10 @@ public class AlergiaRepositoryImpl implements AlergiaRepository {
     }
 
     @Override
-    public void deletar(Long id) {
-        jpaRepository.deleteById(id);
+    public void desativar(Long id) {
+        jpaRepository.findById(id).ifPresent(entity -> {
+            entity.setAtivo(false);
+            jpaRepository.save(entity);
+        });
     }
 }

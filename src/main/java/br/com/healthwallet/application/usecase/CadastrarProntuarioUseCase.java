@@ -47,13 +47,17 @@ public class CadastrarProntuarioUseCase {
 
         Paciente pacienteSalvo = pacienteRepository.salvar(paciente);
 
-        if (Boolean.TRUE.equals(request.possuiAlergia())) {
-            Alergia alergia = new Alergia();
-            alergia.setIdPaciente(pacienteSalvo.getId());
-            alergia.setTipo(request.tipoAlergia());
-            alergia.setDescricao(request.descricaoAlergia());
-
-            alergiaRepository.salvar(alergia);
+        if (Boolean.TRUE.equals(request.possuiAlergia()) && request.alergias() != null) {
+            // RF10 - o paciente pode informar várias alergias já no primeiro cadastro.
+            request.alergias().stream()
+                    .filter(informada -> informada.descricao() != null && !informada.descricao().isBlank())
+                    .forEach(informada -> {
+                        Alergia alergia = new Alergia();
+                        alergia.setIdPaciente(pacienteSalvo.getId());
+                        alergia.setTipo(informada.tipo());
+                        alergia.setDescricao(informada.descricao());
+                        alergiaRepository.salvar(alergia);
+                    });
         }
 
         if (Boolean.TRUE.equals(request.usaMedicamentoContinuo())
