@@ -14,8 +14,9 @@ public class DiagnosticoUseCase {
 
     private final DiagnosticoRepository repository;
     private final AgendamentoRepository agendamentoRepository;
+    private final AcessoPaciente acessoPaciente;
 
-    public Diagnostico salvar(Diagnostico diagnostico) {
+    public Diagnostico salvar(Long idUsuario, Diagnostico diagnostico) {
         // Todo documento precisa ficar vinculado a um paciente, senão apareceria na
         // ficha de todos os pacientes da conta.
         if (diagnostico.getIdPaciente() == null && diagnostico.getIdAgendamento() != null) {
@@ -23,18 +24,24 @@ public class DiagnosticoUseCase {
                     .ifPresent(a -> diagnostico.setIdPaciente(a.getIdPaciente()));
         }
 
+        acessoPaciente.exigirPropriedade(diagnostico.getIdPaciente(), idUsuario);
         return repository.salvar(diagnostico);
     }
 
-    public List<Diagnostico> buscarPorAgendamento(Long idAgendamento) {
+    public List<Diagnostico> buscarPorAgendamento(Long idUsuario, Long idAgendamento) {
+        acessoPaciente.exigirPropriedadePorAgendamento(idAgendamento, idUsuario);
         return repository.buscarPorAgendamento(idAgendamento);
     }
 
-    public List<Diagnostico> buscarPorPaciente(Long idPaciente) {
+    public List<Diagnostico> buscarPorPaciente(Long idUsuario, Long idPaciente) {
+        acessoPaciente.exigirPropriedade(idPaciente, idUsuario);
         return repository.buscarPorPaciente(idPaciente);
     }
 
-    public void desativar(Long id) {
+    public void desativar(Long idUsuario, Long id) {
+        Diagnostico diagnostico = repository.buscarPorId(id)
+                .orElseThrow(() -> new SecurityException("Acesso negado."));
+        acessoPaciente.exigirPropriedade(diagnostico.getIdPaciente(), idUsuario);
         repository.desativar(id);
     }
 }

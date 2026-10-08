@@ -31,6 +31,8 @@ class DiagnosticoUseCaseTest {
     private DiagnosticoRepository diagnosticoRepository;
     @Mock
     private AgendamentoRepository agendamentoRepository;
+    @Mock
+    private AcessoPaciente acessoPaciente;
 
     @InjectMocks
     private DiagnosticoUseCase diagnosticoUseCase;
@@ -50,7 +52,7 @@ class DiagnosticoUseCaseTest {
         when(agendamentoRepository.buscarPorId(5L)).thenReturn(Optional.of(agendamento));
         when(diagnosticoRepository.salvar(any())).thenAnswer(chamada -> chamada.getArgument(0));
 
-        diagnosticoUseCase.salvar(diagnostico);
+        diagnosticoUseCase.salvar(1L, diagnostico);
 
         ArgumentCaptor<Diagnostico> capturado = ArgumentCaptor.forClass(Diagnostico.class);
         verify(diagnosticoRepository).salvar(capturado.capture());
@@ -67,7 +69,7 @@ class DiagnosticoUseCaseTest {
 
         when(diagnosticoRepository.salvar(any())).thenAnswer(chamada -> chamada.getArgument(0));
 
-        diagnosticoUseCase.salvar(diagnostico);
+        diagnosticoUseCase.salvar(1L, diagnostico);
 
         ArgumentCaptor<Diagnostico> capturado = ArgumentCaptor.forClass(Diagnostico.class);
         verify(diagnosticoRepository).salvar(capturado.capture());
@@ -78,8 +80,30 @@ class DiagnosticoUseCaseTest {
     @Test
     @DisplayName("Exclusão é lógica: o registro é desativado, nunca apagado do banco")
     void deveDesativarEmVezDeExcluir() {
-        diagnosticoUseCase.desativar(3L);
+        Diagnostico existente = new Diagnostico();
+        existente.setId(3L);
+        existente.setIdPaciente(7L);
+        when(diagnosticoRepository.buscarPorId(3L)).thenReturn(Optional.of(existente));
+
+        diagnosticoUseCase.desativar(1L, 3L);
 
         verify(diagnosticoRepository).desativar(3L);
+    }
+
+    @Test
+    @DisplayName("Não desativa documento de paciente que não é do usuário autenticado")
+    void naoDesativaDocumentoDeOutroUsuario() {
+        Diagnostico deOutro = new Diagnostico();
+        deOutro.setId(3L);
+        deOutro.setIdPaciente(99L);
+        when(diagnosticoRepository.buscarPorId(3L)).thenReturn(Optional.of(deOutro));
+        org.mockito.Mockito.doThrow(new SecurityException("Acesso negado."))
+                .when(acessoPaciente).exigirPropriedade(99L, 1L);
+
+        org.assertj.core.api.Assertions
+                .assertThatThrownBy(() -> diagnosticoUseCase.desativar(1L, 3L))
+                .isInstanceOf(SecurityException.class);
+
+        verify(diagnosticoRepository, org.mockito.Mockito.never()).desativar(any());
     }
 }

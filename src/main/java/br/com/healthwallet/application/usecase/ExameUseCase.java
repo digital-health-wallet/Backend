@@ -15,8 +15,9 @@ public class ExameUseCase {
 
     private final ExameRepository repository;
     private final AgendamentoRepository agendamentoRepository;
+    private final AcessoPaciente acessoPaciente;
 
-    public Exame salvar(Exame exame) {
+    public Exame salvar(Long idUsuario, Exame exame) {
         if (exame.getDataHoraExame() == null) {
             exame.setDataHoraExame(LocalDate.now());
         }
@@ -28,22 +29,24 @@ public class ExameUseCase {
                     .ifPresent(a -> exame.setIdPaciente(a.getIdPaciente()));
         }
 
+        acessoPaciente.exigirPropriedade(exame.getIdPaciente(), idUsuario);
         return repository.salvar(exame);
     }
 
-    public List<Exame> buscarPorAgendamento(Long idAgendamento) {
+    public List<Exame> buscarPorAgendamento(Long idUsuario, Long idAgendamento) {
+        acessoPaciente.exigirPropriedadePorAgendamento(idAgendamento, idUsuario);
         return repository.buscarPorAgendamento(idAgendamento);
     }
 
-    public List<Exame> buscarAvulsos() {
-        return repository.buscarAvulsos();
-    }
-
-    public List<Exame> buscarPorPaciente(Long idPaciente) {
+    public List<Exame> buscarPorPaciente(Long idUsuario, Long idPaciente) {
+        acessoPaciente.exigirPropriedade(idPaciente, idUsuario);
         return repository.buscarPorPaciente(idPaciente);
     }
 
-    public void desativar(Long id) {
+    public void desativar(Long idUsuario, Long id) {
+        Exame exame = repository.buscarPorId(id)
+                .orElseThrow(() -> new SecurityException("Acesso negado."));
+        acessoPaciente.exigirPropriedade(exame.getIdPaciente(), idUsuario);
         repository.desativar(id);
     }
 }

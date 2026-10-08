@@ -44,6 +44,8 @@ class AgendamentoUseCaseTest {
     private GoogleCalendarRepository googleCalendarRepository;
     @Mock
     private GoogleTokenUseCase googleTokenUseCase;
+    @Mock
+    private AcessoPaciente acessoPaciente;
 
     @InjectMocks
     private AgendamentoUseCase agendamentoUseCase;
@@ -108,8 +110,8 @@ class AgendamentoUseCaseTest {
         when(agendamentoRepository.buscarPorId(10L)).thenReturn(Optional.of(agendamento));
         when(agendamentoRepository.atualizar(any())).thenAnswer(chamada -> chamada.getArgument(0));
 
-        assertThat(agendamentoUseCase.arquivar(10L).getArquivado()).isTrue();
-        assertThat(agendamentoUseCase.desarquivar(10L).getArquivado()).isFalse();
+        assertThat(agendamentoUseCase.arquivar(10L, 1L).getArquivado()).isTrue();
+        assertThat(agendamentoUseCase.desarquivar(10L, 1L).getArquivado()).isFalse();
     }
 
     private Agendamento agendamentoEm(Long id, String hora, String horaFim) {
@@ -272,7 +274,7 @@ class AgendamentoUseCaseTest {
         agendamento.setStatus(StatusAgendamento.AGENDADO);
         when(agendamentoRepository.buscarPorId(10L)).thenReturn(Optional.of(agendamento));
 
-        assertThatThrownBy(() -> agendamentoUseCase.arquivar(10L))
+        assertThatThrownBy(() -> agendamentoUseCase.arquivar(10L, 1L))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("finalizadas ou canceladas");
 
@@ -288,6 +290,6 @@ class AgendamentoUseCaseTest {
         when(agendamentoRepository.buscarPorId(10L)).thenReturn(Optional.of(agendamento));
         when(agendamentoRepository.atualizar(any())).thenAnswer(chamada -> chamada.getArgument(0));
 
-        assertThat(agendamentoUseCase.arquivar(10L).getArquivado()).isTrue();
+        assertThat(agendamentoUseCase.arquivar(10L, 1L).getArquivado()).isTrue();
     }
 }

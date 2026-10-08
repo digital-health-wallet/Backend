@@ -34,6 +34,8 @@ class ReceitaUseCaseTest {
     private MedicamentoRepository medicamentoRepository;
     @Mock
     private AgendamentoRepository agendamentoRepository;
+    @Mock
+    private AcessoPaciente acessoPaciente;
 
     @InjectMocks
     private ReceitaUseCase receitaUseCase;
@@ -62,7 +64,7 @@ class ReceitaUseCaseTest {
         when(receitaRepository.salvar(any())).thenAnswer(chamada -> chamada.getArgument(0));
 
         ArgumentCaptor<Receita> capturada = ArgumentCaptor.forClass(Receita.class);
-        receitaUseCase.salvar(receita);
+        receitaUseCase.salvar(1L, receita);
         org.mockito.Mockito.verify(receitaRepository).salvar(capturada.capture());
 
         assertThat(capturada.getValue().getItens())
@@ -83,7 +85,7 @@ class ReceitaUseCaseTest {
         when(medicamentoRepository.buscarPorNome(any())).thenReturn(Optional.empty());
         when(receitaRepository.salvar(any())).thenAnswer(chamada -> chamada.getArgument(0));
 
-        Receita salva = receitaUseCase.salvar(receita);
+        Receita salva = receitaUseCase.salvar(1L, receita);
 
         assertThat(salva.getItens()).extracting(ItemReceita::getUsoContinuo)
                 .containsExactly(true, false);
@@ -103,7 +105,7 @@ class ReceitaUseCaseTest {
         when(medicamentoRepository.buscarPorNome("Losartana 50mg")).thenReturn(Optional.of(existente));
         when(receitaRepository.salvar(any())).thenAnswer(chamada -> chamada.getArgument(0));
 
-        Receita salva = receitaUseCase.salvar(receita);
+        Receita salva = receitaUseCase.salvar(1L, receita);
 
         assertThat(salva.getItens().get(0).getMedicamento().getId()).isEqualTo(7L);
     }

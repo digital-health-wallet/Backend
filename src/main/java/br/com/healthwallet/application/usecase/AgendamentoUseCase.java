@@ -25,8 +25,10 @@ public class AgendamentoUseCase {
     private final ProfissionalRepository profissionalRepository;
     private final GoogleCalendarRepository googleCalendarRepository;
     private final GoogleTokenUseCase googleTokenUseCase;
+    private final AcessoPaciente acessoPaciente;
 
     public ResultadoAgendamento criar(Agendamento agendamento, boolean sincronizarGoogle, Long idUsuario) {
+        acessoPaciente.exigirPropriedade(agendamento.getIdPaciente(), idUsuario);
         exigirHorarioLivre(agendamento, null);
 
         if (agendamento.getIdProfissional() == null && agendamento.getProfissional() != null) {
@@ -125,16 +127,25 @@ public class AgendamentoUseCase {
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado: " + id));
     }
 
-    public List<Agendamento> listarAtivosPorPaciente(Long idPaciente) {
+    /** Mesma busca, confirmando antes que a consulta pertence a um perfil do usuário. */
+    public Agendamento buscarDoUsuario(Long id, Long idUsuario) {
+        Agendamento agendamento = buscarPorId(id);
+        acessoPaciente.exigirPropriedade(agendamento.getIdPaciente(), idUsuario);
+        return agendamento;
+    }
+
+    public List<Agendamento> listarAtivosPorPaciente(Long idPaciente, Long idUsuario) {
+        acessoPaciente.exigirPropriedade(idPaciente, idUsuario);
         return agendamentoRepository.buscarAtivosPorPaciente(idPaciente);
     }
 
-    public List<Agendamento> listarArquivadosPorPaciente(Long idPaciente) {
+    public List<Agendamento> listarArquivadosPorPaciente(Long idPaciente, Long idUsuario) {
+        acessoPaciente.exigirPropriedade(idPaciente, idUsuario);
         return agendamentoRepository.buscarArquivadosPorPaciente(idPaciente);
     }
 
     public ResultadoAgendamento atualizarStatus(Long id, StatusAgendamento novoStatus, Long idUsuario) {
-        Agendamento agendamento = buscarPorId(id);
+        Agendamento agendamento = buscarDoUsuario(id, idUsuario);
         agendamento.alterarStatus(novoStatus);
 
         String aviso = null;
@@ -156,26 +167,26 @@ public class AgendamentoUseCase {
         return new ResultadoAgendamento(agendamentoRepository.atualizar(agendamento), aviso);
     }
 
-    public Agendamento arquivar(Long id) {
-        Agendamento agendamento = buscarPorId(id);
+    public Agendamento arquivar(Long id, Long idUsuario) {
+        Agendamento agendamento = buscarDoUsuario(id, idUsuario);
         agendamento.arquivar();
         return agendamentoRepository.atualizar(agendamento);
     }
 
-    public Agendamento desarquivar(Long id) {
-        Agendamento agendamento = buscarPorId(id);
+    public Agendamento desarquivar(Long id, Long idUsuario) {
+        Agendamento agendamento = buscarDoUsuario(id, idUsuario);
         agendamento.desarquivar();
         return agendamentoRepository.atualizar(agendamento);
     }
 
-    public Agendamento toggleFavorito(Long id) {
-        Agendamento agendamento = buscarPorId(id);
+    public Agendamento toggleFavorito(Long id, Long idUsuario) {
+        Agendamento agendamento = buscarDoUsuario(id, idUsuario);
         agendamento.toggleFavorito();
         return agendamentoRepository.atualizar(agendamento);
     }
 
     public ResultadoAgendamento atualizar(Long id, Agendamento dados, Long idUsuario) {
-        Agendamento agendamento = buscarPorId(id);
+        Agendamento agendamento = buscarDoUsuario(id, idUsuario);
 
         // UC04 - Fluxo de Exceção: consulta finalizada não pode ser reagendada.
         if (agendamento.getStatus() == StatusAgendamento.FINALIZADO) {

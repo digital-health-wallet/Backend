@@ -2,6 +2,7 @@ package br.com.healthwallet.web.controller;
 
 import br.com.healthwallet.application.usecase.ExameUseCase;
 import br.com.healthwallet.domain.model.Exame;
+import br.com.healthwallet.infrastructure.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,37 +19,32 @@ public class ExameController {
 
     @PostMapping
     public ResponseEntity<Exame> salvar(@RequestBody Exame exame) {
-        Exame exameSalvo = exameUseCase.salvar(exame);
+        Exame exameSalvo = exameUseCase.salvar(AuthenticatedUser.idOuFalhar(), exame);
         return ResponseEntity.status(HttpStatus.CREATED).body(exameSalvo);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Exame> atualizar(@PathVariable Long id, @RequestBody Exame exame) {
         exame.setId(id);
-        return ResponseEntity.ok(exameUseCase.salvar(exame));
+        return ResponseEntity.ok(exameUseCase.salvar(AuthenticatedUser.idOuFalhar(), exame));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativar(@PathVariable Long id) {
-        exameUseCase.desativar(id);
+        exameUseCase.desativar(AuthenticatedUser.idOuFalhar(), id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/agendamento/{idAgendamento}")
     public ResponseEntity<List<Exame>> buscarPorAgendamento(@PathVariable Long idAgendamento) {
-        List<Exame> exames = exameUseCase.buscarPorAgendamento(idAgendamento);
+        List<Exame> exames = exameUseCase.buscarPorAgendamento(AuthenticatedUser.idOuFalhar(), idAgendamento);
         return ResponseEntity.ok(exames);
     }
 
-    @GetMapping("/avulsos")
-    public ResponseEntity<List<Exame>> buscarAvulsos() {
-        List<Exame> exames = exameUseCase.buscarAvulsos();
-        return ResponseEntity.ok(exames);
-    }
 
     @GetMapping("/paciente/{idPaciente}")
     public ResponseEntity<List<Exame>> buscarPorPaciente(@PathVariable Long idPaciente) {
-        List<Exame> exames = exameUseCase.buscarPorPaciente(idPaciente);
+        List<Exame> exames = exameUseCase.buscarPorPaciente(AuthenticatedUser.idOuFalhar(), idPaciente);
         return ResponseEntity.ok(exames);
     }
 }

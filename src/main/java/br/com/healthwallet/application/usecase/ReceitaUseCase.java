@@ -19,8 +19,9 @@ public class ReceitaUseCase {
     private final ReceitaRepository receitaRepository;
     private final MedicamentoRepository medicamentoRepository;
     private final AgendamentoRepository agendamentoRepository;
+    private final AcessoPaciente acessoPaciente;
 
-    public Receita salvar(Receita receita) {
+    public Receita salvar(Long idUsuario, Receita receita) {
         if (receita.getDataEmissao() == null) {
             receita.setDataEmissao(LocalDateTime.now());
         }
@@ -48,22 +49,24 @@ public class ReceitaUseCase {
             });
         }
 
+        acessoPaciente.exigirPropriedade(receita.getIdPaciente(), idUsuario);
         return receitaRepository.salvar(receita);
     }
 
-    public List<Receita> buscarPorAgendamento(Long idAgendamento) {
+    public List<Receita> buscarPorAgendamento(Long idUsuario, Long idAgendamento) {
+        acessoPaciente.exigirPropriedadePorAgendamento(idAgendamento, idUsuario);
         return receitaRepository.buscarPorAgendamento(idAgendamento);
     }
 
-    public List<Receita> buscarAvulsas() {
-        return receitaRepository.buscarAvulsas();
-    }
-
-    public List<Receita> buscarPorPaciente(Long idPaciente) {
+    public List<Receita> buscarPorPaciente(Long idUsuario, Long idPaciente) {
+        acessoPaciente.exigirPropriedade(idPaciente, idUsuario);
         return receitaRepository.buscarPorPaciente(idPaciente);
     }
 
-    public void desativar(Long id) {
+    public void desativar(Long idUsuario, Long id) {
+        Receita receita = receitaRepository.buscarPorId(id)
+                .orElseThrow(() -> new SecurityException("Acesso negado."));
+        acessoPaciente.exigirPropriedade(receita.getIdPaciente(), idUsuario);
         receitaRepository.desativar(id);
     }
 }

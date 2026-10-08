@@ -1,5 +1,6 @@
 package br.com.healthwallet.web.controller;
 
+import br.com.healthwallet.application.usecase.AcessoPaciente;
 import br.com.healthwallet.application.usecase.AgendamentoUseCase;
 import br.com.healthwallet.application.usecase.GoogleTokenUseCase;
 import br.com.healthwallet.application.usecase.ResultadoAgendamento;
@@ -29,6 +30,7 @@ public class AgendamentoController {
     private final AgendamentoUseCase agendamentoUseCase;
     private final SincronizarAgendaUseCase sincronizarAgendaUseCase;
     private final GoogleTokenUseCase googleTokenUseCase;
+    private final AcessoPaciente acessoPaciente;
 
     @PostMapping
     public ResponseEntity<AgendamentoResponse> criar(@Valid @RequestBody AgendamentoRequest request) {
@@ -41,6 +43,7 @@ public class AgendamentoController {
 
     @PostMapping("/sincronizar-google/sugestoes")
     public ResponseEntity<List<Agendamento>> buscarSugestoesGoogle(@RequestParam Long idPaciente) {
+        acessoPaciente.exigirPropriedade(idPaciente, AuthenticatedUser.idOuFalhar());
         String accessToken = googleTokenUseCase.obterAccessTokenValido(AuthenticatedUser.idOuFalhar());
         List<Agendamento> sugestoes = sincronizarAgendaUseCase.buscarSugestoes(idPaciente, accessToken);
         return ResponseEntity.ok(sugestoes);
@@ -56,18 +59,18 @@ public class AgendamentoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AgendamentoResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.buscarPorId(id)));
+        return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.buscarDoUsuario(id, AuthenticatedUser.idOuFalhar())));
     }
 
     @GetMapping("/paciente/{idPaciente}")
     public ResponseEntity<List<AgendamentoResponse>> listarAtivos(@PathVariable Long idPaciente) {
-        return ResponseEntity.ok(agendamentoUseCase.listarAtivosPorPaciente(idPaciente)
+        return ResponseEntity.ok(agendamentoUseCase.listarAtivosPorPaciente(idPaciente, AuthenticatedUser.idOuFalhar())
                 .stream().map(AgendamentoResponse::from).toList());
     }
 
     @GetMapping("/paciente/{idPaciente}/arquivados")
     public ResponseEntity<List<AgendamentoResponse>> listarArquivados(@PathVariable Long idPaciente) {
-        return ResponseEntity.ok(agendamentoUseCase.listarArquivadosPorPaciente(idPaciente)
+        return ResponseEntity.ok(agendamentoUseCase.listarArquivadosPorPaciente(idPaciente, AuthenticatedUser.idOuFalhar())
                 .stream().map(AgendamentoResponse::from).toList());
     }
 
@@ -87,17 +90,17 @@ public class AgendamentoController {
 
     @PatchMapping("/{id}/arquivar")
     public ResponseEntity<AgendamentoResponse> arquivar(@PathVariable Long id) {
-        return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.arquivar(id)));
+        return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.arquivar(id, AuthenticatedUser.idOuFalhar())));
     }
 
     @PatchMapping("/{id}/desarquivar")
     public ResponseEntity<AgendamentoResponse> desarquivar(@PathVariable Long id) {
-        return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.desarquivar(id)));
+        return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.desarquivar(id, AuthenticatedUser.idOuFalhar())));
     }
 
     @PatchMapping("/{id}/favorito")
     public ResponseEntity<AgendamentoResponse> toggleFavorito(@PathVariable Long id) {
-        return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.toggleFavorito(id)));
+        return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.toggleFavorito(id, AuthenticatedUser.idOuFalhar())));
     }
 
     /**
