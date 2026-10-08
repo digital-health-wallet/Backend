@@ -35,3 +35,6 @@ build/
 ### Environment ###
 .env
 !.env.example
+
+# Dados de demonstração para testes locais — não versionar
+src/main/resources/db/migration/V14__insert_dados_demonstracao.sql
