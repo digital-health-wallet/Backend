@@ -19,7 +19,7 @@ public class EmergenciaController {
 
     @GetMapping("/{codigo}")
     public ResponseEntity<EmergenciaResponse> buscarFicha(@PathVariable String codigo) {
-        return ResponseEntity.ok(emergenciaUseCase.buscarFichaPublica(codigo));
+        return ResponseEntity.ok(EmergenciaResponse.from(emergenciaUseCase.buscarFichaPublica(codigo)));
     }
 
     @ExceptionHandler(SecurityException.class)

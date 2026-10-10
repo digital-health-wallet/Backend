@@ -1,6 +1,7 @@
 package br.com.healthwallet.web.controller;
 
 import br.com.healthwallet.application.usecase.AuthUseCase;
+import br.com.healthwallet.application.usecase.ResultadoAutenticacao;
 import br.com.healthwallet.infrastructure.security.AuthenticatedUser;
 import br.com.healthwallet.web.dto.AuthResponse;
 import br.com.healthwallet.web.dto.GoogleAuthUrlResponse;
@@ -34,7 +35,8 @@ public class AuthController {
 
     @PostMapping("/otp/verificar")
     public ResponseEntity<AuthResponse> verificarOtp(@Valid @RequestBody VerificarOtpRequest request) {
-        return ResponseEntity.ok(authUseCase.verificarOtp(request.email(), request.codigo()));
+        return ResponseEntity.ok(AuthResponse.from(
+                authUseCase.verificarOtp(request.email(), request.codigo())));
     }
 
     /**
@@ -56,7 +58,8 @@ public class AuthController {
     public ResponseEntity<Void> callbackGoogle(@RequestParam String code,
                                                 @RequestParam(required = false) String state) {
         Long idUsuarioLogado = extrairUsuarioDoState(state);
-        AuthResponse resposta = authUseCase.processarCallbackGoogle(code, idUsuarioLogado);
+        ResultadoAutenticacao resultado = authUseCase.processarCallbackGoogle(code, idUsuarioLogado);
+        AuthResponse resposta = AuthResponse.from(resultado);
 
         String redirectUrl = UriComponentsBuilder.fromUriString(frontendGoogleCallbackUrl)
                 .queryParam("token", resposta.token())

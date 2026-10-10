@@ -6,8 +6,6 @@ import br.com.healthwallet.domain.repository.AlergiaRepository;
 import br.com.healthwallet.domain.repository.DiagnosticoRepository;
 import br.com.healthwallet.domain.repository.PacienteRepository;
 import br.com.healthwallet.domain.repository.ReceitaRepository;
-import br.com.healthwallet.web.dto.AlergiaRequest;
-import br.com.healthwallet.web.dto.PacienteUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,22 +56,25 @@ public class PacienteUseCase {
     }
 
     @Transactional
-    public PacienteComAlergia atualizar(Long idPaciente, Long idUsuario, PacienteUpdateRequest dados) {
+    /**
+     * @param dados    perfil com os campos já preenchidos pelo controlador
+     * @param alergias lista que deve passar a valer; vazia remove todas as atuais
+     */
+    public PacienteComAlergia atualizar(Long idPaciente, Long idUsuario, Paciente dados,
+                                         List<Alergia> alergias) {
         Paciente paciente = buscarDoUsuario(idPaciente, idUsuario);
 
-        paciente.setNome(dados.nome());
-        if (dados.cpf() != null) {
-            paciente.setCpf(dados.cpf());
+        paciente.setNome(dados.getNome());
+        if (dados.getCpf() != null) {
+            paciente.setCpf(dados.getCpf());
         }
-        paciente.setDataNascimento(dados.dataNascimento());
-        paciente.setTipoSanguineo(dados.tipoSanguineo());
-        paciente.setFichaEmergencialAtiva(dados.fichaEmergencialAtiva());
+        paciente.setDataNascimento(dados.getDataNascimento());
+        paciente.setTipoSanguineo(dados.getTipoSanguineo());
+        paciente.setFichaEmergencialAtiva(dados.getFichaEmergencialAtiva());
 
         Paciente atualizado = pacienteRepository.salvar(paciente);
 
-        List<Alergia> informadas = Boolean.TRUE.equals(dados.possuiAlergia())
-                ? sincronizarAlergias(idPaciente, dados.alergias())
-                : sincronizarAlergias(idPaciente, List.of());
+        List<Alergia> informadas = sincronizarAlergias(idPaciente, alergias);
 
         return new PacienteComAlergia(
                 atualizado,
@@ -87,12 +88,12 @@ public class PacienteUseCase {
      * desativa as que foram removidas na tela. A desativação preserva o registro,
      * conforme a política de exclusão lógica adotada para dado clínico.
      */
-    private List<Alergia> sincronizarAlergias(Long idPaciente, List<AlergiaRequest> informadas) {
+    private List<Alergia> sincronizarAlergias(Long idPaciente, List<Alergia> informadas) {
         List<Alergia> existentes = alergiaRepository.buscarPorPaciente(idPaciente);
-        List<AlergiaRequest> recebidas = informadas != null ? informadas : List.of();
+        List<Alergia> recebidas = informadas != null ? informadas : List.of();
 
         Set<Long> idsMantidos = recebidas.stream()
-                .map(AlergiaRequest::id)
+                .map(Alergia::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -101,15 +102,11 @@ public class PacienteUseCase {
                 .forEach(removida -> alergiaRepository.desativar(removida.getId()));
 
         return recebidas.stream()
-                .filter(recebida -> recebida.descricao() != null && !recebida.descricao().isBlank())
+                .filter(recebida -> recebida.getDescricao() != null && !recebida.getDescricao().isBlank())
                 .map(recebida -> {
-                    Alergia alergia = new Alergia();
-                    alergia.setId(recebida.id());
-                    alergia.setIdPaciente(idPaciente);
-                    alergia.setTipo(recebida.tipo());
-                    alergia.setDescricao(recebida.descricao());
-                    alergia.setAtivo(true);
-                    return alergiaRepository.salvar(alergia);
+                    recebida.setIdPaciente(idPaciente);
+                    recebida.setAtivo(true);
+                    return alergiaRepository.salvar(recebida);
                 })
                 .toList();
     }

@@ -9,7 +9,6 @@ import br.com.healthwallet.domain.model.Receita;
 import br.com.healthwallet.domain.repository.AlergiaRepository;
 import br.com.healthwallet.domain.repository.PacienteRepository;
 import br.com.healthwallet.domain.repository.ReceitaRepository;
-import br.com.healthwallet.web.dto.CadastroProntuarioRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
@@ -32,38 +31,29 @@ public class CadastrarProntuarioUseCase {
         this.receitaRepository = receitaRepository;
     }
 
+    /**
+     * @param paciente    perfil já preenchido pelo controlador, sem id nem código
+     * @param alergias    RF10 - alergias a registrar; pode vir vazia
+     * @param medicamentos medicamentos de uso contínuo a registrar; pode vir vazia
+     */
     @Transactional
-    public Paciente executar(CadastroProntuarioRequest request, Long idUsuario) {
-        Paciente paciente = new Paciente();
+    public Paciente executar(Paciente paciente, Long idUsuario,
+                              List<Alergia> alergias, List<ItemReceita> medicamentos) {
         paciente.setIdUsuario(idUsuario);
-        paciente.setCpf(request.cpf());
-        paciente.setNome(request.nome());
-        paciente.setDataNascimento(request.dataNascimento());
-        paciente.setTipoSanguineo(request.tipoSanguineo());
-        paciente.setFichaEmergencialAtiva(request.fichaEmergencialAtiva());
         paciente.setAtivo(true);
-
         paciente.setCodigoEmergencia(UUID.randomUUID().toString());
 
         Paciente pacienteSalvo = pacienteRepository.salvar(paciente);
 
-        if (Boolean.TRUE.equals(request.possuiAlergia()) && request.alergias() != null) {
-            // RF10 - o paciente pode informar várias alergias já no primeiro cadastro.
-            request.alergias().stream()
-                    .filter(informada -> informada.descricao() != null && !informada.descricao().isBlank())
-                    .forEach(informada -> {
-                        Alergia alergia = new Alergia();
-                        alergia.setIdPaciente(pacienteSalvo.getId());
-                        alergia.setTipo(informada.tipo());
-                        alergia.setDescricao(informada.descricao());
-                        alergiaRepository.salvar(alergia);
-                    });
+        if (alergias != null) {
+            alergias.forEach(alergia -> {
+                alergia.setIdPaciente(pacienteSalvo.getId());
+                alergiaRepository.salvar(alergia);
+            });
         }
 
-        if (Boolean.TRUE.equals(request.usaMedicamentoContinuo())
-                && request.medicamentosContinuos() != null
-                && !request.medicamentosContinuos().isEmpty()) {
-            adicionarMedicamentosContinuos(pacienteSalvo.getId(), request.medicamentosContinuos());
+        if (medicamentos != null && !medicamentos.isEmpty()) {
+            adicionarMedicamentosContinuos(pacienteSalvo.getId(), medicamentos);
         }
 
         return pacienteSalvo;
@@ -75,19 +65,9 @@ public class CadastrarProntuarioUseCase {
      * editar um paciente já existente. Não aparece na listagem de Documentos.
      */
     @Transactional
-    public void adicionarMedicamentosContinuos(Long idPaciente,
-                                                List<CadastroProntuarioRequest.MedicamentoContinuoRequest> medicamentos) {
+    public void adicionarMedicamentosContinuos(Long idPaciente, List<ItemReceita> medicamentos) {
         List<ItemReceita> itens = medicamentos.stream()
-                .map(med -> {
-                    Medicamento medicamento = new Medicamento();
-                    medicamento.setNomeMedicamento(med.nome());
-
-                    ItemReceita item = new ItemReceita();
-                    item.setMedicamento(medicamento);
-                    item.setPosologia(med.posologia());
-                    item.setUsoContinuo(true);
-                    return item;
-                })
+                .peek(item -> item.setUsoContinuo(true))
                 .collect(Collectors.toList());
 
         // Receita avulsa (sem agendamento) marcada como origem do prontuário: existe só

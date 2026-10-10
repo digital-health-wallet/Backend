@@ -7,8 +7,6 @@ import br.com.healthwallet.domain.repository.AlergiaRepository;
 import br.com.healthwallet.domain.repository.DiagnosticoRepository;
 import br.com.healthwallet.domain.repository.PacienteRepository;
 import br.com.healthwallet.domain.repository.ReceitaRepository;
-import br.com.healthwallet.web.dto.AlergiaRequest;
-import br.com.healthwallet.web.dto.PacienteUpdateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,9 +65,22 @@ class PacienteUseCaseTest {
         return alergia;
     }
 
-    private PacienteUpdateRequest requisicao(List<AlergiaRequest> alergias) {
-        return new PacienteUpdateRequest("Maria", "333.333.333-90", LocalDate.of(1990, 1, 1),
-                "O+", true, alergias != null && !alergias.isEmpty(), alergias);
+    private Paciente dadosAtualizados() {
+        Paciente dados = new Paciente();
+        dados.setNome("Maria");
+        dados.setCpf("333.333.333-90");
+        dados.setDataNascimento(LocalDate.of(1990, 1, 1));
+        dados.setTipoSanguineo("O+");
+        dados.setFichaEmergencialAtiva(true);
+        return dados;
+    }
+
+    private Alergia informada(Long id, TipoAlergia tipo, String descricao) {
+        Alergia alergia = new Alergia();
+        alergia.setId(id);
+        alergia.setTipo(tipo);
+        alergia.setDescricao(descricao);
+        return alergia;
     }
 
     private void prepararPaciente() {
@@ -84,9 +95,9 @@ class PacienteUseCaseTest {
         when(alergiaRepository.buscarPorPaciente(1L)).thenReturn(List.of());
         when(alergiaRepository.salvar(any())).thenAnswer(chamada -> chamada.getArgument(0));
 
-        PacienteComAlergia resultado = pacienteUseCase.atualizar(1L, 9L, requisicao(List.of(
-                new AlergiaRequest(null, TipoAlergia.M, "Dipirona"),
-                new AlergiaRequest(null, TipoAlergia.A, "Amendoim"))));
+        PacienteComAlergia resultado = pacienteUseCase.atualizar(1L, 9L, dadosAtualizados(), List.of(
+                informada(null, TipoAlergia.M, "Dipirona"),
+                informada(null, TipoAlergia.A, "Amendoim")));
 
         assertThat(resultado.alergias()).hasSize(2)
                 .extracting(Alergia::getDescricao)
@@ -102,8 +113,8 @@ class PacienteUseCaseTest {
         when(alergiaRepository.salvar(any())).thenAnswer(chamada -> chamada.getArgument(0));
 
         // A tela devolve apenas a primeira: a segunda foi removida pelo usuário.
-        pacienteUseCase.atualizar(1L, 9L, requisicao(List.of(
-                new AlergiaRequest(5L, TipoAlergia.M, "Dipirona"))));
+        pacienteUseCase.atualizar(1L, 9L, dadosAtualizados(), List.of(
+                informada(5L, TipoAlergia.M, "Dipirona")));
 
         verify(alergiaRepository).desativar(6L);
         verify(alergiaRepository, never()).desativar(5L);
@@ -116,7 +127,7 @@ class PacienteUseCaseTest {
         when(alergiaRepository.buscarPorPaciente(1L))
                 .thenReturn(List.of(alergia(5L, "Dipirona"), alergia(6L, "Amendoim")));
 
-        PacienteComAlergia resultado = pacienteUseCase.atualizar(1L, 9L, requisicao(List.of()));
+        PacienteComAlergia resultado = pacienteUseCase.atualizar(1L, 9L, dadosAtualizados(), List.of());
 
         assertThat(resultado.alergias()).isEmpty();
         verify(alergiaRepository).desativar(5L);
@@ -130,8 +141,8 @@ class PacienteUseCaseTest {
         prepararPaciente();
         when(alergiaRepository.buscarPorPaciente(1L)).thenReturn(List.of());
 
-        PacienteComAlergia resultado = pacienteUseCase.atualizar(1L, 9L, requisicao(List.of(
-                new AlergiaRequest(null, TipoAlergia.M, "   "))));
+        PacienteComAlergia resultado = pacienteUseCase.atualizar(1L, 9L, dadosAtualizados(), List.of(
+                informada(null, TipoAlergia.M, "   ")));
 
         assertThat(resultado.alergias()).isEmpty();
         verify(alergiaRepository, never()).salvar(any());
@@ -143,7 +154,7 @@ class PacienteUseCaseTest {
         when(pacienteRepository.buscarPorId(1L)).thenReturn(Optional.of(paciente));
 
         org.assertj.core.api.Assertions
-                .assertThatThrownBy(() -> pacienteUseCase.atualizar(1L, 99L, requisicao(List.of())))
+                .assertThatThrownBy(() -> pacienteUseCase.atualizar(1L, 99L, dadosAtualizados(), List.of()))
                 .isInstanceOf(SecurityException.class);
 
         verify(alergiaRepository, never()).desativar(anyLong());

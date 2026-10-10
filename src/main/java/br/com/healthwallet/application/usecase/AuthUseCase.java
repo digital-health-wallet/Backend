@@ -6,7 +6,6 @@ import br.com.healthwallet.infrastructure.external.email.EmailService;
 import br.com.healthwallet.infrastructure.external.email.OtpService;
 import br.com.healthwallet.infrastructure.external.google.GoogleOAuthService;
 import br.com.healthwallet.infrastructure.security.JwtService;
-import br.com.healthwallet.web.dto.AuthResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +39,7 @@ public class AuthUseCase {
     }
 
     @Transactional
-    public AuthResponse verificarOtp(String email, String codigo) {
+    public ResultadoAutenticacao verificarOtp(String email, String codigo) {
         if (!otpService.validarEInvalidar(email, codigo)) {
             throw new IllegalArgumentException("Código inválido ou expirado.");
         }
@@ -66,7 +65,7 @@ public class AuthUseCase {
      * contrário, autentica (ou cria) o Usuário pelo e-mail retornado pelo Google.
      */
     @Transactional
-    public AuthResponse processarCallbackGoogle(String code, Long idUsuarioLogado) {
+    public ResultadoAutenticacao processarCallbackGoogle(String code, Long idUsuarioLogado) {
         GoogleOAuthService.GoogleTokenResult tokenResult = googleOAuthService.trocarCodigoPorToken(code);
 
         Usuario usuario = idUsuarioLogado != null
@@ -116,8 +115,10 @@ public class AuthUseCase {
                 });
     }
 
-    private AuthResponse gerarResposta(Usuario usuario) {
+    //Quem de fato vai criar a identidade do usuário no meu app
+    private ResultadoAutenticacao gerarResposta(Usuario usuario) {
         String token = jwtService.gerarToken(usuario.getId(), usuario.getEmail());
-        return new AuthResponse(token, usuario.getId(), usuario.getEmail(), usuario.possuiCalendarConectado());
+        return new ResultadoAutenticacao(token, usuario.getId(), usuario.getEmail(),
+                usuario.possuiCalendarConectado());
     }
 }

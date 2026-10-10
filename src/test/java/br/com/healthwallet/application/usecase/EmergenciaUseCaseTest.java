@@ -6,7 +6,6 @@ import br.com.healthwallet.domain.repository.AlergiaRepository;
 import br.com.healthwallet.domain.repository.DiagnosticoRepository;
 import br.com.healthwallet.domain.repository.PacienteRepository;
 import br.com.healthwallet.domain.repository.ReceitaRepository;
-import br.com.healthwallet.web.dto.EmergenciaResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,12 +65,12 @@ class EmergenciaUseCaseTest {
         when(diagnosticoRepository.buscarCronicosPorPaciente(1L)).thenReturn(List.of(cronico));
         when(receitaRepository.buscarItensUsoContinuoPorPaciente(1L)).thenReturn(List.of());
 
-        EmergenciaResponse ficha = emergenciaUseCase.buscarFichaPublica("COD-123");
+        FichaEmergencial ficha = emergenciaUseCase.buscarFichaPublica("COD-123");
 
-        assertThat(ficha.nome()).isEqualTo("Maria");
-        assertThat(ficha.tipoSanguineo()).isEqualTo("O+");
+        assertThat(ficha.paciente().getNome()).isEqualTo("Maria");
+        assertThat(ficha.paciente().getTipoSanguineo()).isEqualTo("O+");
         assertThat(ficha.diagnosticosCronicos()).hasSize(1);
-        assertThat(ficha.diagnosticosCronicos().get(0).nome()).isEqualTo("Hipertensão");
+        assertThat(ficha.diagnosticosCronicos().get(0).getNome()).isEqualTo("Hipertensão");
     }
 
     @Test
