@@ -42,18 +42,22 @@ public class AgendamentoController {
     }
 
     @PostMapping("/sincronizar-google/sugestoes")
-    public ResponseEntity<List<Agendamento>> buscarSugestoesGoogle(@RequestParam Long idPaciente) {
+    public ResponseEntity<List<AgendamentoResponse>> buscarSugestoesGoogle(@RequestParam Long idPaciente) {
         acessoPaciente.exigirPropriedade(idPaciente, AuthenticatedUser.idOuFalhar());
         String accessToken = googleTokenUseCase.obterAccessTokenValido(AuthenticatedUser.idOuFalhar());
-        List<Agendamento> sugestoes = sincronizarAgendaUseCase.buscarSugestoes(idPaciente, accessToken);
-        return ResponseEntity.ok(sugestoes);
+        return ResponseEntity.ok(sincronizarAgendaUseCase.buscarSugestoes(idPaciente, accessToken)
+                .stream().map(AgendamentoResponse::from).toList());
     }
 
     @PostMapping("/sincronizar-google/confirmar")
     public ResponseEntity<Void> confirmarImportacao(
-            @RequestBody List<Agendamento> selecionados) {
+            @Valid @RequestBody List<AgendamentoRequest> selecionados) {
 
-        sincronizarAgendaUseCase.salvarSelecionados(selecionados);
+        Long idUsuario = AuthenticatedUser.idOuFalhar();
+        List<Agendamento> agendamentos = selecionados.stream().map(this::toModel).toList();
+        agendamentos.forEach(a -> acessoPaciente.exigirPropriedade(a.getIdPaciente(), idUsuario));
+
+        sincronizarAgendaUseCase.salvarSelecionados(agendamentos);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

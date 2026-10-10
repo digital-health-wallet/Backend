@@ -2,7 +2,11 @@ package br.com.healthwallet.web.controller;
 
 import br.com.healthwallet.application.usecase.ExameUseCase;
 import br.com.healthwallet.domain.model.Exame;
+import br.com.healthwallet.domain.model.Upload;
 import br.com.healthwallet.infrastructure.security.AuthenticatedUser;
+import br.com.healthwallet.web.dto.ExameRequest;
+import br.com.healthwallet.web.dto.ExameResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +22,18 @@ public class ExameController {
     private final ExameUseCase exameUseCase;
 
     @PostMapping
-    public ResponseEntity<Exame> salvar(@RequestBody Exame exame) {
-        Exame exameSalvo = exameUseCase.salvar(AuthenticatedUser.idOuFalhar(), exame);
-        return ResponseEntity.status(HttpStatus.CREATED).body(exameSalvo);
+    public ResponseEntity<ExameResponse> salvar(@Valid @RequestBody ExameRequest request) {
+        Exame salvo = exameUseCase.salvar(AuthenticatedUser.idOuFalhar(), toModel(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ExameResponse.from(salvo));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Exame> atualizar(@PathVariable Long id, @RequestBody Exame exame) {
+    public ResponseEntity<ExameResponse> atualizar(@PathVariable Long id,
+                                                    @Valid @RequestBody ExameRequest request) {
+        Exame exame = toModel(request);
         exame.setId(id);
-        return ResponseEntity.ok(exameUseCase.salvar(AuthenticatedUser.idOuFalhar(), exame));
+        return ResponseEntity.ok(ExameResponse.from(
+                exameUseCase.salvar(AuthenticatedUser.idOuFalhar(), exame)));
     }
 
     @DeleteMapping("/{id}")
@@ -36,15 +43,36 @@ public class ExameController {
     }
 
     @GetMapping("/agendamento/{idAgendamento}")
-    public ResponseEntity<List<Exame>> buscarPorAgendamento(@PathVariable Long idAgendamento) {
-        List<Exame> exames = exameUseCase.buscarPorAgendamento(AuthenticatedUser.idOuFalhar(), idAgendamento);
-        return ResponseEntity.ok(exames);
+    public ResponseEntity<List<ExameResponse>> buscarPorAgendamento(@PathVariable Long idAgendamento) {
+        return ResponseEntity.ok(
+                exameUseCase.buscarPorAgendamento(AuthenticatedUser.idOuFalhar(), idAgendamento)
+                        .stream().map(ExameResponse::from).toList());
     }
 
-
     @GetMapping("/paciente/{idPaciente}")
-    public ResponseEntity<List<Exame>> buscarPorPaciente(@PathVariable Long idPaciente) {
-        List<Exame> exames = exameUseCase.buscarPorPaciente(AuthenticatedUser.idOuFalhar(), idPaciente);
-        return ResponseEntity.ok(exames);
+    public ResponseEntity<List<ExameResponse>> buscarPorPaciente(@PathVariable Long idPaciente) {
+        return ResponseEntity.ok(
+                exameUseCase.buscarPorPaciente(AuthenticatedUser.idOuFalhar(), idPaciente)
+                        .stream().map(ExameResponse::from).toList());
+    }
+
+    private Exame toModel(ExameRequest request) {
+        Exame exame = new Exame();
+        exame.setIdAgendamento(request.idAgendamento());
+        exame.setIdPaciente(request.idPaciente());
+        exame.setNomeExame(request.nomeExame());
+        exame.setDataHoraExame(request.dataHoraExame());
+        exame.setObservacoes(request.observacoes());
+
+        if (request.uploads() != null) {
+            exame.setUploads(request.uploads().stream().map(u -> {
+                Upload upload = new Upload();
+                upload.setId(u.id());
+                upload.setBase64(u.base64());
+                return upload;
+            }).toList());
+        }
+
+        return exame;
     }
 }

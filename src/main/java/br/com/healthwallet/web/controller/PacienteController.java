@@ -37,8 +37,12 @@ public class PacienteController {
     }
 
     @GetMapping("/meus")
-    public ResponseEntity<List<Paciente>> listarMeusPacientes() {
-        return ResponseEntity.ok(pacienteUseCase.listarDoUsuario(AuthenticatedUser.idOuFalhar()));
+    public ResponseEntity<List<PacienteResponse>> listarMeusPacientes() {
+        Long idUsuario = AuthenticatedUser.idOuFalhar();
+        return ResponseEntity.ok(pacienteUseCase.listarDoUsuario(idUsuario).stream()
+                .map(paciente -> PacienteResponse.from(
+                        pacienteUseCase.buscarDetalhadoDoUsuario(paciente.getId(), idUsuario)))
+                .toList());
     }
 
     @GetMapping("/{id}")
