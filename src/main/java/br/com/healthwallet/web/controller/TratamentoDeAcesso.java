@@ -7,12 +7,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Converte a recusa de propriedade em 403 para todas as rotas autenticadas. A
- * ficha de emergência tem tratamento próprio, por ser rota pública.
+ * Converte a recusa de propriedade em 403, com a mensagem, para os controladores
+ * da aplicação. A ficha de emergência declara o próprio tratamento e por isso não
+ * é afetada: lá a recusa sai como 404, para não revelar se um código existe.
  */
-@RestControllerAdvice(basePackages = "br.com.healthwallet.web.controller",
-        assignableTypes = {PacienteController.class, ExameController.class,
-                ReceitaController.class, DiagnosticoController.class, AgendamentoController.class})
+@RestControllerAdvice(basePackages = "br.com.healthwallet.web.controller")
 public class TratamentoDeAcesso {
 
     @ExceptionHandler(SecurityException.class)
