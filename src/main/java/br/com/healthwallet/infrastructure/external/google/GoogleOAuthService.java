@@ -52,8 +52,12 @@ public class GoogleOAuthService {
     public String gerarUrlConsentimento(String state) {
         exigirConfiguracao();
         GoogleAuthorizationCodeRequestUrl url = new GoogleAuthorizationCodeRequestUrl(clientId, redirectUri, SCOPES)
-                .setAccessType("offline")
-                .setApprovalPrompt("force");
+                .setAccessType("offline");
+
+        // "prompt=consent" substitui o "approval_prompt=force", que o Google depreciou e
+        // hoje costuma ignorar. Sem ele, uma autorização concedida antes de os escopos
+        // mudarem continua sendo reaproveitada, e o token volta sem a permissão nova.
+        url.set("prompt", "consent");
 
         if (state != null && !state.isBlank()) {
             url.setState(state);
