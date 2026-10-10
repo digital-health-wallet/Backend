@@ -1,6 +1,7 @@
 package br.com.healthwallet.infrastructure.config;
 
 import br.com.healthwallet.infrastructure.security.JwtAuthenticationFilter;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth
+                        // O Spring encaminha erros para /error numa nova requisição, sem
+                        // contexto de autenticação. Sem liberar esse encaminhamento, uma
+                        // falha de validação chega ao cliente como 403 em vez de 400 — e o
+                        // frontend, que desloga em 403, encerraria a sessão do usuário.
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/emergencia/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
