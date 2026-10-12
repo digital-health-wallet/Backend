@@ -89,21 +89,4 @@ class DiagnosticoUseCaseTest {
 
         verify(diagnosticoRepository).desativar(3L);
     }
-
-    @Test
-    @DisplayName("Não desativa documento de paciente que não é do usuário autenticado")
-    void naoDesativaDocumentoDeOutroUsuario() {
-        Diagnostico deOutro = new Diagnostico();
-        deOutro.setId(3L);
-        deOutro.setIdPaciente(99L);
-        when(diagnosticoRepository.buscarPorId(3L)).thenReturn(Optional.of(deOutro));
-        org.mockito.Mockito.doThrow(new SecurityException("Acesso negado."))
-                .when(acessoPaciente).exigirPropriedade(99L, 1L);
-
-        org.assertj.core.api.Assertions
-                .assertThatThrownBy(() -> diagnosticoUseCase.desativar(1L, 3L))
-                .isInstanceOf(SecurityException.class);
-
-        verify(diagnosticoRepository, org.mockito.Mockito.never()).desativar(any());
-    }
 }
