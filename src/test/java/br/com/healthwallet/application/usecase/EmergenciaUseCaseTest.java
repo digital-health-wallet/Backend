@@ -22,12 +22,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
-/**
- * UC06 - Ficha de emergência é rota pública: os testes garantem que dados clínicos
- * só são expostos quando o paciente está ativo E autorizou a ficha.
- */
 @ExtendWith(MockitoExtension.class)
-class EmergenciaUseCaseTest {
+class   EmergenciaUseCaseTest {
 
     @Mock
     private PacienteRepository pacienteRepository;

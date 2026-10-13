@@ -7,8 +7,8 @@ import java.util.Optional;
 public interface ExameRepository {
     Exame salvar(Exame exame);
     Optional<Exame> buscarPorId(Long id);
-    List<Exame> buscarPorAgendamento(Long idAgendamento); // Busca os vinculados a consultas
-    List<Exame> buscarAvulsos(); // Busca os que têm idAgendamento = null
-    List<Exame> buscarPorPaciente(Long idPaciente); // Vinculados às consultas do paciente + avulsos
+    List<Exame> buscarPorAgendamento(Long idAgendamento);
+    List<Exame> buscarAvulsos();
+    List<Exame> buscarPorPaciente(Long idPaciente);
     void desativar(Long id);
 }

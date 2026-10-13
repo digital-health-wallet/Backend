@@ -10,7 +10,7 @@ public record ProfissionalResponse(
         String nomeClinica,
         String email,
         String especialidade,
-        EnderecoResponse endereco // Traz o endereço aninhado, se existir
+        EnderecoResponse endereco
 ) {
     public static ProfissionalResponse from(Profissional profissional) {
         if (profissional == null) return null;
@@ -23,7 +23,6 @@ public record ProfissionalResponse(
                 profissional.getNomeClinica(),
                 profissional.getEmail(),
                 profissional.getEspecialidade(),
-                // Se o profissional tiver endereço, converte usando o padrão do EnderecoResponse
                 profissional.getEndereco() != null ? EnderecoResponse.from(profissional.getEndereco()) : null
         );
     }

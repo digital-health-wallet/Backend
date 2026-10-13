@@ -3,7 +3,6 @@ package br.com.healthwallet.application.usecase;
 
 import br.com.healthwallet.domain.model.Alergia;
 import br.com.healthwallet.domain.model.ItemReceita;
-import br.com.healthwallet.domain.model.Medicamento;
 import br.com.healthwallet.domain.model.Paciente;
 import br.com.healthwallet.domain.model.Receita;
 import br.com.healthwallet.domain.repository.AlergiaRepository;
@@ -59,20 +58,12 @@ public class CadastrarProntuarioUseCase {
         return pacienteSalvo;
     }
 
-    /**
-     * Registra medicamento(s) de uso contínuo direto no prontuário do paciente (não
-     * vinculado a uma consulta/receita) — usado tanto no cadastro inicial quanto ao
-     * editar um paciente já existente. Não aparece na listagem de Documentos.
-     */
     @Transactional
     public void adicionarMedicamentosContinuos(Long idPaciente, List<ItemReceita> medicamentos) {
         List<ItemReceita> itens = medicamentos.stream()
                 .peek(item -> item.setUsoContinuo(true))
                 .collect(Collectors.toList());
 
-        // Receita avulsa (sem agendamento) marcada como origem do prontuário: existe só
-        // pra registrar o uso contínuo direto no perfil do paciente — não deve aparecer
-        // na listagem de Documentos.
         Receita receita = new Receita();
         receita.setDataEmissao(LocalDateTime.now());
         receita.setItens(itens);

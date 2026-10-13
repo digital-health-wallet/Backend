@@ -48,8 +48,6 @@ public class AgendamentoUseCase {
         agendamento.setFavorito(false);
         agendamento.setArquivado(false);
 
-        // Consulta é salva localmente primeiro: a sincronização com o Google é
-        // opcional (RF06) e sua falha nunca pode impedir o agendamento local.
         Agendamento salvo = agendamentoRepository.salvar(agendamento);
 
         if (!sincronizarGoogle) {
@@ -127,7 +125,6 @@ public class AgendamentoUseCase {
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado: " + id));
     }
 
-    /** Mesma busca, confirmando antes que a consulta pertence a um perfil do usuário. */
     public Agendamento buscarDoUsuario(Long id, Long idUsuario) {
         Agendamento agendamento = buscarPorId(id);
         acessoPaciente.exigirPropriedade(agendamento.getIdPaciente(), idUsuario);
@@ -149,9 +146,6 @@ public class AgendamentoUseCase {
         agendamento.alterarStatus(novoStatus);
 
         String aviso = null;
-
-        // UC04: cancelamento remove o evento sincronizado, se existir. Falha no
-        // Google não impede o cancelamento local.
         if (novoStatus == StatusAgendamento.CANCELADO && agendamento.getGoogleEventId() != null) {
             try {
                 String accessToken = googleTokenUseCase.obterAccessTokenValido(idUsuario);
@@ -188,7 +182,6 @@ public class AgendamentoUseCase {
     public ResultadoAgendamento atualizar(Long id, Agendamento dados, Long idUsuario) {
         Agendamento agendamento = buscarDoUsuario(id, idUsuario);
 
-        // UC04 - Fluxo de Exceção: consulta finalizada não pode ser reagendada.
         if (agendamento.getStatus() == StatusAgendamento.FINALIZADO) {
             throw new IllegalStateException("Não é possível reagendar uma consulta finalizada.");
         }
@@ -206,16 +199,12 @@ public class AgendamentoUseCase {
         agendamento.setHoraAgendamento(dados.getHoraAgendamento());
         agendamento.setHoraFim(dados.getHoraFim());
 
-        // RF05 - alterar data ou horário caracteriza reagendamento, e o status passa a
-        // refletir isso. Consulta cancelada permanece cancelada.
         if (mudouHorario && agendamento.getStatus() != StatusAgendamento.CANCELADO) {
             agendamento.setStatus(StatusAgendamento.REAGENDADO);
         }
 
         String aviso = null;
 
-        // UC04: reagendamento atualiza o evento já sincronizado, se existir.
-        // Falha no Google não impede o reagendamento local.
         if (agendamento.getGoogleEventId() != null) {
             try {
                 String accessToken = googleTokenUseCase.obterAccessTokenValido(idUsuario);

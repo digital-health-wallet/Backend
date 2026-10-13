@@ -2,9 +2,6 @@ package br.com.healthwallet.infrastructure.security;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
-/**
- * Resolve o id do Usuário autenticado a partir do JWT já validado pelo JwtAuthenticationFilter.
- */
 public final class AuthenticatedUser {
 
     private AuthenticatedUser() {

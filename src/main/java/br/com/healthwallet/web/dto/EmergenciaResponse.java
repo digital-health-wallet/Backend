@@ -7,11 +7,6 @@ import br.com.healthwallet.domain.model.ItemReceita;
 
 import java.util.List;
 
-/**
- * UC06 - Acessar Ficha via QR Code. Exibe estritamente dados vitais
- * de emergência (RF13): tipo sanguíneo, alergias, diagnósticos crônicos
- * e medicamentos de uso contínuo. Nenhum outro dado do paciente é exposto.
- */
 public record EmergenciaResponse(
         String nome,
         String tipoSanguineo,

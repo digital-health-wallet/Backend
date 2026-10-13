@@ -21,7 +21,6 @@ public class ItemReceitaEntity {
     @JoinColumn(name = "id_receita", nullable = false)
     private ReceitaEntity receita;
 
-    // CascadeType.PERSIST garante que se o medicamento for novo, ele entra no banco automaticamente
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_medicamento", nullable = false)
     private MedicamentoEntity medicamento;

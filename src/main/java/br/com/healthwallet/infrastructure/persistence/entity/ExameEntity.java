@@ -25,8 +25,6 @@ public class ExameEntity {
     @JoinColumn(name = "id_agendamento", nullable = true)
     private AgendamentoEntity agendamento;
 
-    // Vínculo direto com o paciente: preenchido sempre, inclusive quando o documento
-    // é avulso (sem agendamento).
     @Column(name = "id_paciente")
     private Long idPaciente;
 

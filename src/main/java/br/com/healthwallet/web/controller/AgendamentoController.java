@@ -107,11 +107,6 @@ public class AgendamentoController {
         return ResponseEntity.ok(AgendamentoResponse.from(agendamentoUseCase.toggleFavorito(id, AuthenticatedUser.idOuFalhar())));
     }
 
-    /**
-     * UC03 e UC04 - Fluxos de Exceção: choque de agendas e tentativa de alterar
-     * consulta finalizada devolvem 409 com a mensagem, para que a interface possa
-     * exibi-la em vez de falhar silenciosamente.
-     */
     @ExceptionHandler({ConflitoAgendamentoException.class, IllegalStateException.class})
     public ResponseEntity<ErroResponse> tratarConflito(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErroResponse(e.getMessage()));

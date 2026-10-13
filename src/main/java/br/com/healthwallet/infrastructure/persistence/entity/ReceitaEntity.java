@@ -11,8 +11,8 @@ import java.util.List;
 @Table(name = "receitas")
 @Getter
 @Setter
-@Builder // Adicionado
-@NoArgsConstructor // Adicionado para o JPA não quebrar
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class ReceitaEntity {
 
@@ -25,8 +25,7 @@ public class ReceitaEntity {
     @JoinColumn(name = "id_agendamento", nullable = true)
     private AgendamentoEntity agendamento;
 
-    // Vínculo direto com o paciente: preenchido sempre, inclusive quando a receita
-    // é avulsa (sem agendamento).
+
     @Column(name = "id_paciente")
     private Long idPaciente;
 
@@ -36,8 +35,6 @@ public class ReceitaEntity {
     @Column(name = "orientacoes_gerais", columnDefinition = "TEXT")
     private String orientacoesGerais;
 
-    // Receita criada automaticamente pelo cadastro do prontuário (medicamento de uso
-    // contínuo informado ali) — não deve aparecer na listagem de Documentos.
     @Builder.Default
     @Column(name = "origem_prontuario")
     private Boolean origemProntuario = false;

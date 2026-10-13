@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Receita {
     private Long id;
-    private Long idAgendamento; // Pode ser null para receitas avulsas
+    private Long idAgendamento;
     private Long idPaciente;
     private LocalDateTime dataEmissao;
     private String orientacoesGerais;
@@ -25,7 +25,6 @@ public class Receita {
         this.uploads = uploads;
     }
 
-    // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

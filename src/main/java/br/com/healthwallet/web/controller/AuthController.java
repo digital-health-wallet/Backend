@@ -39,11 +39,6 @@ public class AuthController {
                 authUseCase.verificarOtp(request.email(), request.codigo())));
     }
 
-    /**
-     * Chamado via XHR pelo Angular (não é navegação de página, então JSON é adequado aqui).
-     * Se o usuário já estiver logado e quiser conectar o Calendar (RF06), o front deve mandar
-     * o próprio JWT em "state"; ele volta intacto no callback, sem precisar de sessão no backend.
-     */
     @GetMapping("/google/url")
     public ResponseEntity<GoogleAuthUrlResponse> urlConsentimentoGoogle(@RequestParam(required = false) String state) {
         return ResponseEntity.ok(new GoogleAuthUrlResponse(authUseCase.gerarUrlConsentimentoGoogle(state)));

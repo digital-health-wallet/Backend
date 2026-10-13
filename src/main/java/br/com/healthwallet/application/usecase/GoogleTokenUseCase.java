@@ -12,12 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-/**
- * Garante que exista um access_token válido do Google para o Usuário,
- * renovando-o via refresh_token quando necessário (RF06), e resolve a
- * agenda secundária dedicada de cada Paciente (evita misturar agendamentos
- * de pacientes diferentes na agenda "primary" do cuidador).
- */
+
 @Service
 @RequiredArgsConstructor
 public class GoogleTokenUseCase {
@@ -51,11 +46,7 @@ public class GoogleTokenUseCase {
         return resultado.getAccessToken();
     }
 
-    /**
-     * Retorna o id da agenda secundária do Paciente no Google Calendar do cuidador,
-     * criando-a na primeira sincronização. Um cuidador que gerencia vários pacientes
-     * (RF02) passa a ter uma agenda por paciente em vez de tudo junto na "primary".
-     */
+
     @Transactional
     public String obterCalendarioDoPaciente(Long idPaciente, Long idUsuario) {
         Paciente paciente = pacienteRepository.buscarPorId(idPaciente)

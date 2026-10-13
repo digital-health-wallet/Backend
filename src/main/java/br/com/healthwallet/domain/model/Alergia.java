@@ -4,8 +4,8 @@ import br.com.healthwallet.domain.model.enums.TipoAlergia;
 
 public class Alergia {
     private Long id;
-    private Long idPaciente;    // Referência ao paciente
-    private Long idMedicamento; // Referência ao medicamento (opcional/futuro)
+    private Long idPaciente;
+    private Long idMedicamento;
     private TipoAlergia tipo;
     private String descricao;
     private Boolean ativo = true;

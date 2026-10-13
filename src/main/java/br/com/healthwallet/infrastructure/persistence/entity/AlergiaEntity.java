@@ -23,11 +23,6 @@ public class AlergiaEntity {
     @JoinColumn(name = "id_paciente", nullable = false)
     private PacienteEntity paciente;
 
-    // Deixei comentado caso ainda venha a implementar a entidade MedicamentoEntity futuramente
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "id_medicamento")
-    // private MedicamentoEntity medicamento;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 1, nullable = false)
     private TipoAlergia tipo;

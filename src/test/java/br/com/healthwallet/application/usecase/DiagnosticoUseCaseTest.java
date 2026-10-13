@@ -20,10 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-/**
- * Todo documento clínico precisa ficar vinculado a um paciente: sem esse vínculo,
- * um documento avulso apareceria na ficha de emergência de todos os pacientes da conta.
- */
+
 @ExtendWith(MockitoExtension.class)
 class DiagnosticoUseCaseTest {
 

@@ -6,11 +6,7 @@ import br.com.healthwallet.domain.repository.PacienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-/**
- * RNF02 - Antes de retornar ou modificar dados de um paciente, confirma que o
- * perfil pertence ao usuário autenticado. Sem esta verificação bastaria trocar o
- * identificador na URL para alcançar o histórico clínico de outra conta.
- */
+
 @Component
 @RequiredArgsConstructor
 public class AcessoPaciente {
@@ -31,10 +27,6 @@ public class AcessoPaciente {
         }
     }
 
-    /**
-     * Mesma verificação a partir de uma consulta: o documento pertence ao paciente
-     * da consulta, e a consulta precisa ser de um perfil do usuário autenticado.
-     */
     public void exigirPropriedadePorAgendamento(Long idAgendamento, Long idUsuario) {
         Long idPaciente = agendamentoRepository.buscarPorId(idAgendamento)
                 .map(a -> a.getIdPaciente())

@@ -22,8 +22,6 @@ public class ExameUseCase {
             exame.setDataHoraExame(LocalDate.now());
         }
 
-        // Todo documento precisa ficar vinculado a um paciente, senão apareceria na
-        // ficha de todos os pacientes da conta.
         if (exame.getIdPaciente() == null && exame.getIdAgendamento() != null) {
             agendamentoRepository.buscarPorId(exame.getIdAgendamento())
                     .ifPresent(a -> exame.setIdPaciente(a.getIdPaciente()));

@@ -7,10 +7,7 @@ import br.com.healthwallet.domain.model.Paciente;
 
 import java.util.List;
 
-/**
- * @param alergias RF10 - o paciente pode ter várias alergias registradas; lista vazia
- *                 quando nenhuma foi informada.
- */
+
 public record PacienteComAlergia(
         Paciente paciente,
         List<Alergia> alergias,

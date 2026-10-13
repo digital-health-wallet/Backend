@@ -20,11 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * UC07 - Cadastrar e Gerenciar Perfil de Paciente. Todas as operações são
- * restritas ao Usuário autenticado (modo cuidador: um Usuário pode gerenciar
- * vários Pacientes - o próprio e/ou dependentes).
- */
 @RestController
 @RequestMapping("/api/pacientes")
 @RequiredArgsConstructor
@@ -88,7 +83,6 @@ public class PacienteController {
             @PathVariable Long id,
             @RequestBody List<CadastroProntuarioRequest.MedicamentoContinuoRequest> medicamentos) {
 
-        // Garante que o paciente pertence ao usuário autenticado antes de gravar.
         pacienteUseCase.buscarDoUsuario(id, AuthenticatedUser.idOuFalhar());
 
         cadastrarProntuarioUseCase.adicionarMedicamentosContinuos(id, toMedicamentos(medicamentos));
@@ -107,7 +101,6 @@ public class PacienteController {
         return paciente;
     }
 
-    /** Descarta as linhas em branco que a tela envia quando um campo fica vazio. */
     private List<Alergia> toAlergias(List<AlergiaRequest> informadas) {
         if (informadas == null) return List.of();
 

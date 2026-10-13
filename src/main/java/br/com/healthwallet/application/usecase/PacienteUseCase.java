@@ -16,11 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * UC07 - Cadastrar e Gerenciar Perfil de Paciente: leitura, edição e
- * inativação lógica (RF02), sempre restritas ao Usuário dono do perfil
- * (modo cuidador: um Usuário pode gerenciar vários Pacientes).
- */
+
 @Service
 @RequiredArgsConstructor
 public class PacienteUseCase {
@@ -42,10 +38,7 @@ public class PacienteUseCase {
         return paciente;
     }
 
-    /**
-     * Inclui as alergias cadastradas, para telas como "Gerenciar Paciente"
-     * conseguirem exibir/editar sem uma segunda chamada.
-     */
+
     public PacienteComAlergia buscarDetalhadoDoUsuario(Long idPaciente, Long idUsuario) {
         Paciente paciente = buscarDoUsuario(idPaciente, idUsuario);
         return new PacienteComAlergia(
@@ -83,11 +76,7 @@ public class PacienteUseCase {
                 receitaRepository.buscarItensUsoContinuoPorPaciente(idPaciente));
     }
 
-    /**
-     * RF10 - reconcilia o histórico de alergias do paciente: grava as informadas e
-     * desativa as que foram removidas na tela. A desativação preserva o registro,
-     * conforme a política de exclusão lógica adotada para dado clínico.
-     */
+
     private List<Alergia> sincronizarAlergias(Long idPaciente, List<Alergia> informadas) {
         List<Alergia> existentes = alergiaRepository.buscarPorPaciente(idPaciente);
         List<Alergia> recebidas = informadas != null ? informadas : List.of();

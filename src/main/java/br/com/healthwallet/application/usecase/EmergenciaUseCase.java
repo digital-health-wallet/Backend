@@ -8,11 +8,6 @@ import br.com.healthwallet.domain.repository.ReceitaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/**
- * UC06 - Acessar Ficha via QR Code (Módulo de Emergência). Rota pública
- * (RF13), acessível por socorristas não autenticados, restrita a dados
- * vitais e apenas quando o Paciente ativou a ficha de emergência.
- */
 @Service
 @RequiredArgsConstructor
 public class EmergenciaUseCase {

@@ -21,10 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-/**
- * RF06/UC03 - A sincronização com o Google Calendar é opcional e sua falha nunca
- * pode impedir que a consulta seja salva localmente.
- */
+
 @ExtendWith(MockitoExtension.class)
 class AgendamentoUseCaseTest {
 

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Exame {
     private Long id;
-    private Long idAgendamento; // Pode ser null para exames avulsos
+    private Long idAgendamento;
     private Long idPaciente;
     private String nomeExame;
     private LocalDate dataHoraExame;

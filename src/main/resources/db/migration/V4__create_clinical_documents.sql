@@ -1,4 +1,3 @@
--- Criação da tabela de Medicamentos
 CREATE TABLE medicamentos (
                               id_medicamento SERIAL PRIMARY KEY,
                               nome_medicamento VARCHAR(50) NOT NULL,
@@ -6,7 +5,6 @@ CREATE TABLE medicamentos (
                               feedback TEXT
 );
 
--- Criação da tabela de Diagnósticos (ligada ao agendamento)
 CREATE TABLE diagnostico (
                              id_diagnostico SERIAL PRIMARY KEY,
                              id_agendamento INTEGER NOT NULL,
@@ -17,7 +15,6 @@ CREATE TABLE diagnostico (
                              CONSTRAINT fk_diagnostico_agendamento FOREIGN KEY (id_agendamento) REFERENCES agendamentos(id) ON DELETE CASCADE
 );
 
--- Criação da tabela de Exames (id_agendamento é NULLABLE)
 CREATE TABLE exames (
                         id_exame SERIAL PRIMARY KEY,
                         id_agendamento INTEGER NULL,
@@ -27,7 +24,6 @@ CREATE TABLE exames (
                         CONSTRAINT fk_exames_agendamento FOREIGN KEY (id_agendamento) REFERENCES agendamentos(id) ON DELETE SET NULL
 );
 
--- Criação da tabela de Receitas (id_agendamento é NULLABLE)
 CREATE TABLE receitas (
                           id_receita SERIAL PRIMARY KEY,
                           id_agendamento INTEGER NULL,
@@ -36,7 +32,6 @@ CREATE TABLE receitas (
                           CONSTRAINT fk_receitas_agendamento FOREIGN KEY (id_agendamento) REFERENCES agendamentos(id) ON DELETE SET NULL
 );
 
--- Criação da tabela de Itens da Receita (N-N entre Receita e Medicamento)
 CREATE TABLE item_receita (
                               id_item_receita SERIAL PRIMARY KEY,
                               id_receita INTEGER NOT NULL,
@@ -47,7 +42,6 @@ CREATE TABLE item_receita (
                               CONSTRAINT fk_item_receita_medicamento FOREIGN KEY (id_medicamento) REFERENCES medicamentos(id_medicamento)
 );
 
--- Criação da tabela de Uploads (Centraliza arquivos de Exames e Receitas)
 CREATE TABLE uploads (
                          id_upload SERIAL PRIMARY KEY,
                          id_exame INTEGER NULL,

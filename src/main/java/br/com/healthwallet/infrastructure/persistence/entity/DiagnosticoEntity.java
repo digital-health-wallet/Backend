@@ -7,8 +7,8 @@ import lombok.*;
 @Table(name = "diagnostico")
 @Getter
 @Setter
-@Builder // Adicionado
-@NoArgsConstructor // Adicionado para o JPA não quebrar
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class DiagnosticoEntity {
 
@@ -17,13 +17,10 @@ public class DiagnosticoEntity {
     @Column(name = "id_diagnostico")
     private Long id;
 
-    // Relacionamento com Agendamento (nulo para diagnósticos avulsos)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_agendamento", nullable = true)
     private AgendamentoEntity agendamento;
 
-    // Vínculo direto com o paciente: preenchido sempre, inclusive quando o diagnóstico
-    // é avulso (sem agendamento).
     @Column(name = "id_paciente")
     private Long idPaciente;
 

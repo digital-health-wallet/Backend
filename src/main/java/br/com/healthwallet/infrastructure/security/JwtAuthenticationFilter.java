@@ -33,9 +33,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
-            // Token pode ter assinatura/expiração válidas mas apontar para um usuário que não
-            // existe mais (ex.: banco reiniciado em dev). Nesse caso, não autentica: a rota
-            // protegida responde 401 e o frontend força o logout.
             if (jwtService.tokenValido(token)) {
                 Long idUsuario = jwtService.extrairIdUsuario(token);
 

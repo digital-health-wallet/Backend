@@ -26,8 +26,6 @@ public class ReceitaUseCase {
             receita.setDataEmissao(LocalDateTime.now());
         }
 
-        // Todo documento precisa ficar vinculado a um paciente, senão apareceria na
-        // ficha de todos os pacientes da conta.
         if (receita.getIdPaciente() == null && receita.getIdAgendamento() != null) {
             agendamentoRepository.buscarPorId(receita.getIdAgendamento())
                     .ifPresent(a -> receita.setIdPaciente(a.getIdPaciente()));
@@ -41,10 +39,8 @@ public class ReceitaUseCase {
                             .buscarPorNome(item.getMedicamento().getNomeMedicamento());
 
                     if (medExistente.isPresent()) {
-                        // Se o remédio já existe, atrelamos o ID. O Mapper vai usar getReferenceById
                         item.getMedicamento().setId(medExistente.get().getId());
                     }
-                    // Se não existe, o ID continua nulo, e o Cascade do JPA vai criar um novo na tabela
                 }
             });
         }

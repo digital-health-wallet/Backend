@@ -14,11 +14,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Encapsula o fluxo de OAuth2 do Google (RF06, UC01): geração da URL de
- * consentimento, troca do código de autorização por tokens e renovação
- * de access_token via refresh_token.
- */
 @Component
 public class GoogleOAuthService {
 
@@ -45,7 +40,7 @@ public class GoogleOAuthService {
     }
 
     /**
-     * @param state repassado pelo Google de volta ao callback (RFC 6749 §4.1.1). Usado aqui para
+     * @param state repassado pelo Google de volta ao callback. Usado aqui para
      *              carregar o JWT do usuário já logado, permitindo vincular o Calendar a uma conta
      *              existente sem depender de sessão/cookie no backend (fluxo stateless SPA).
      */
@@ -54,9 +49,7 @@ public class GoogleOAuthService {
         GoogleAuthorizationCodeRequestUrl url = new GoogleAuthorizationCodeRequestUrl(clientId, redirectUri, SCOPES)
                 .setAccessType("offline");
 
-        // "prompt=consent" substitui o "approval_prompt=force", que o Google depreciou e
-        // hoje costuma ignorar. Sem ele, uma autorização concedida antes de os escopos
-        // mudarem continua sendo reaproveitada, e o token volta sem a permissão nova.
+
         url.set("prompt", "consent");
 
         if (state != null && !state.isBlank()) {

@@ -30,10 +30,6 @@ public class SincronizarAgendaUseCase {
     public void salvarSelecionados(List<Agendamento> selecionados) {
         selecionados.forEach(localRepository::salvar);
     }
-
-    /**
-     * Regra de Negócio: Whitelist. Só deixa passar o que for da área da saúde!
-     */
     private boolean pareceSerEventoSaude(Agendamento a) {
         String texto = "";
         if (a.getEspecialidade() != null) texto += a.getEspecialidade().toLowerCase() + " ";

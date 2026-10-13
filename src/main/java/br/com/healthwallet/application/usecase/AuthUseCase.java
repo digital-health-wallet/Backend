@@ -12,10 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-/**
- * UC01 - Autenticação e Gestão de Conta: login por e-mail (OTP) e login/consentimento
- * via Google (também usado para conectar o Google Calendar a uma conta já existente - RF06).
- */
+
 @Service
 @RequiredArgsConstructor
 public class AuthUseCase {
@@ -59,11 +56,7 @@ public class AuthUseCase {
         return googleOAuthService.gerarUrlConsentimento(jwtUsuarioLogado);
     }
 
-    /**
-     * Processa o retorno do consentimento do Google. Se idUsuarioLogado for informado,
-     * os tokens são vinculados à conta já autenticada (conectar calendário); caso
-     * contrário, autentica (ou cria) o Usuário pelo e-mail retornado pelo Google.
-     */
+
     @Transactional
     public ResultadoAutenticacao processarCallbackGoogle(String code, Long idUsuarioLogado) {
         GoogleOAuthService.GoogleTokenResult tokenResult = googleOAuthService.trocarCodigoPorToken(code);
@@ -93,11 +86,7 @@ public class AuthUseCase {
         usuarioRepository.salvar(usuario);
     }
 
-    /**
-     * Usado para decodificar o "state" do callback do Google: se for um JWT válido
-     * (usuário já logado pedindo para conectar o Calendar), devolve o id; caso
-     * contrário (login novo via Google), devolve null.
-     */
+
     public Long idUsuarioDoJwtOuNulo(String possivelJwt) {
         if (possivelJwt == null || possivelJwt.isBlank() || !jwtService.tokenValido(possivelJwt)) {
             return null;

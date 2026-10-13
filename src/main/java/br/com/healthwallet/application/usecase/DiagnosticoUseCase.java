@@ -17,8 +17,6 @@ public class DiagnosticoUseCase {
     private final AcessoPaciente acessoPaciente;
 
     public Diagnostico salvar(Long idUsuario, Diagnostico diagnostico) {
-        // Todo documento precisa ficar vinculado a um paciente, senão apareceria na
-        // ficha de todos os pacientes da conta.
         if (diagnostico.getIdPaciente() == null && diagnostico.getIdAgendamento() != null) {
             agendamentoRepository.buscarPorId(diagnostico.getIdAgendamento())
                     .ifPresent(a -> diagnostico.setIdPaciente(a.getIdPaciente()));

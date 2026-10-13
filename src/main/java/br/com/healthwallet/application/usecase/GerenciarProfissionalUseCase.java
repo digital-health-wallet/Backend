@@ -60,17 +60,12 @@ public class GerenciarProfissionalUseCase {
         return profissionalRepository.salvar(profissional);
     }
 
-    /**
-     * Regra de Negócio: Verifica se o médico já existe na base antes de cadastrar.
-     * Ideal para ser chamado pela sincronização do Google Calendar ou criação de novo agendamento.
-     */
     @Transactional
     public void autoCadastrarSeNaoExistir(String nome, String especialidade, String clinica) {
         if (nome != null && !nome.trim().isEmpty()) {
             boolean existe = profissionalRepository.buscarPorNome(nome).isPresent();
 
             if (!existe) {
-                // Usando a classe de Domínio Pura, instanciada com 'new' e 'setters'
                 Profissional novo = new Profissional();
                 novo.setNomeProfissional(nome);
                 novo.setEspecialidade(especialidade);
