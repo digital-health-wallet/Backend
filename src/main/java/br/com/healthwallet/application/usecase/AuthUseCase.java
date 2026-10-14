@@ -104,7 +104,6 @@ public class AuthUseCase {
                 });
     }
 
-    //Quem de fato vai criar a identidade do usuário no meu app
     private ResultadoAutenticacao gerarResposta(Usuario usuario) {
         String token = jwtService.gerarToken(usuario.getId(), usuario.getEmail());
         return new ResultadoAutenticacao(token, usuario.getId(), usuario.getEmail(),

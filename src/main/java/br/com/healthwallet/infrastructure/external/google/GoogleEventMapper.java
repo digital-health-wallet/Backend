@@ -64,7 +64,6 @@ public class GoogleEventMapper {
             agendamento.setHoraAgendamento(LocalTime.now().withNano(0));
         }
 
-        // Com base no título do evento, setar o tipo da consulta, se não set a o default
         String tituloLowerCase = titulo.toLowerCase();
         if (tituloLowerCase.contains("exame") || tituloLowerCase.contains("sangue") || tituloLowerCase.contains("ultrassom") || tituloLowerCase.contains("raio-x") || tituloLowerCase.contains("ressonância")) {
             agendamento.setTipoConsulta(TipoConsulta.EXAME);

@@ -12,8 +12,6 @@ public interface ReceitaJpaRepository extends JpaRepository<ReceitaEntity, Long>
     List<ReceitaEntity> findByAgendamentoId(Long agendamentoId);
     List<ReceitaEntity> findByAgendamentoIsNull();
 
-    // Receitas de origem do prontuário ficam de fora: elas existem só para registrar
-    // medicamento de uso contínuo no perfil, não são documentos da consulta.
     @Query("SELECT r FROM ReceitaEntity r WHERE r.idPaciente = :idPaciente AND r.ativo = true AND r.origemProntuario = false")
     List<ReceitaEntity> buscarAtivasDoPaciente(@Param("idPaciente") Long idPaciente);
 }

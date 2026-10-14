@@ -73,7 +73,7 @@ public class ReceitaMapper {
             List<ItemReceitaEntity> itemEntities = domain.getItens().stream()
                     .map(item -> {
                         ItemReceitaEntity ie = itemToEntity(item);
-                        ie.setReceita(entity); // Vínculo bidirecional JPA
+                        ie.setReceita(entity);
                         return ie;
                     })
                     .collect(Collectors.toList());
@@ -111,7 +111,6 @@ public class ReceitaMapper {
         MedicamentoEntity medicamentoEntity = null;
         if (domain.getMedicamento() != null) {
             if (domain.getMedicamento().getId() != null) {
-                // Medicamento existente -> Usa referência JPA
                 medicamentoEntity = medicamentoJpaRepository.getReferenceById(domain.getMedicamento().getId());
             } else {
                 medicamentoEntity = medicamentoToEntity(domain.getMedicamento());
