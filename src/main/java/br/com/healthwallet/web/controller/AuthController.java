@@ -44,11 +44,6 @@ public class AuthController {
         return ResponseEntity.ok(new GoogleAuthUrlResponse(authUseCase.gerarUrlConsentimentoGoogle(state)));
     }
 
-    /**
-     * Retorno do consentimento do Google: é o próprio navegador que chega aqui (redirect do
-     * Google), não uma chamada XHR do Angular — por isso a resposta precisa ser um redirect
-     * HTTP de volta para o frontend com o JWT na querystring, e não um corpo JSON.
-     */
     @GetMapping("/google/callback")
     public ResponseEntity<Void> callbackGoogle(@RequestParam String code,
                                                 @RequestParam(required = false) String state) {
