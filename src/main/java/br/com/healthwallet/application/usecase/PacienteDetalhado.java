@@ -8,7 +8,7 @@ import br.com.healthwallet.domain.model.Paciente;
 import java.util.List;
 
 
-public record PacienteComAlergia(
+public record PacienteDetalhado(
         Paciente paciente,
         List<Alergia> alergias,
         List<Diagnostico> diagnosticosCronicos,

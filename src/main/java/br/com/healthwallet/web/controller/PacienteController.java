@@ -1,7 +1,7 @@
 package br.com.healthwallet.web.controller;
 
 import br.com.healthwallet.application.usecase.CadastrarProntuarioUseCase;
-import br.com.healthwallet.application.usecase.PacienteComAlergia;
+import br.com.healthwallet.application.usecase.PacienteDetalhado;
 import br.com.healthwallet.application.usecase.PacienteUseCase;
 import br.com.healthwallet.domain.model.Alergia;
 import br.com.healthwallet.domain.model.ItemReceita;
@@ -36,7 +36,7 @@ public class PacienteController {
                 Boolean.TRUE.equals(request.possuiAlergia()) ? toAlergias(request.alergias()) : List.of(),
                 Boolean.TRUE.equals(request.usaMedicamentoContinuo())
                         ? toMedicamentos(request.medicamentosContinuos()) : List.of());
-        PacienteComAlergia detalhado = pacienteUseCase.buscarDetalhadoDoUsuario(pacienteCriado.getId(), AuthenticatedUser.idOuFalhar());
+        PacienteDetalhado detalhado = pacienteUseCase.buscarDetalhadoDoUsuario(pacienteCriado.getId(), AuthenticatedUser.idOuFalhar());
         return ResponseEntity.status(HttpStatus.CREATED).body(PacienteResponse.from(detalhado));
     }
 
@@ -51,7 +51,7 @@ public class PacienteController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PacienteResponse> buscarPorId(@PathVariable Long id) {
-        PacienteComAlergia detalhado = pacienteUseCase.buscarDetalhadoDoUsuario(id, AuthenticatedUser.idOuFalhar());
+        PacienteDetalhado detalhado = pacienteUseCase.buscarDetalhadoDoUsuario(id, AuthenticatedUser.idOuFalhar());
         return ResponseEntity.ok(PacienteResponse.from(detalhado));
     }
 
@@ -67,7 +67,7 @@ public class PacienteController {
         List<Alergia> alergias = Boolean.TRUE.equals(request.possuiAlergia())
                 ? toAlergias(request.alergias()) : List.of();
 
-        PacienteComAlergia detalhado = pacienteUseCase.atualizar(
+        PacienteDetalhado detalhado = pacienteUseCase.atualizar(
                 id, AuthenticatedUser.idOuFalhar(), dados, alergias);
         return ResponseEntity.ok(PacienteResponse.from(detalhado));
     }
@@ -87,7 +87,7 @@ public class PacienteController {
 
         cadastrarProntuarioUseCase.adicionarMedicamentosContinuos(id, toMedicamentos(medicamentos));
 
-        PacienteComAlergia detalhado = pacienteUseCase.buscarDetalhadoDoUsuario(id, AuthenticatedUser.idOuFalhar());
+        PacienteDetalhado detalhado = pacienteUseCase.buscarDetalhadoDoUsuario(id, AuthenticatedUser.idOuFalhar());
         return ResponseEntity.ok(PacienteResponse.from(detalhado));
     }
 

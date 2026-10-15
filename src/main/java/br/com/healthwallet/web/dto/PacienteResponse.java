@@ -1,6 +1,6 @@
 package br.com.healthwallet.web.dto;
 
-import br.com.healthwallet.application.usecase.PacienteComAlergia;
+import br.com.healthwallet.application.usecase.PacienteDetalhado;
 import br.com.healthwallet.domain.model.enums.TipoAlergia;
 
 import java.time.LocalDate;
@@ -23,7 +23,7 @@ public record PacienteResponse(
     public record AlergiaResumo(Long id, TipoAlergia tipo, String descricao) {
     }
 
-    public static PacienteResponse from(PacienteComAlergia dados) {
+    public static PacienteResponse from(PacienteDetalhado dados) {
         List<AlergiaResumo> alergias = dados.alergias().stream()
                 .map(a -> new AlergiaResumo(a.getId(), a.getTipo(), a.getDescricao()))
                 .toList();

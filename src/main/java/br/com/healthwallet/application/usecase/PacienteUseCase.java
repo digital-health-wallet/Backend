@@ -39,9 +39,9 @@ public class PacienteUseCase {
     }
 
 
-    public PacienteComAlergia buscarDetalhadoDoUsuario(Long idPaciente, Long idUsuario) {
+    public PacienteDetalhado buscarDetalhadoDoUsuario(Long idPaciente, Long idUsuario) {
         Paciente paciente = buscarDoUsuario(idPaciente, idUsuario);
-        return new PacienteComAlergia(
+        return new PacienteDetalhado(
                 paciente,
                 alergiaRepository.buscarPorPaciente(idPaciente),
                 diagnosticoRepository.buscarCronicosPorPaciente(idPaciente),
@@ -53,7 +53,7 @@ public class PacienteUseCase {
      * @param dados    perfil com os campos já preenchidos pelo controlador
      * @param alergias lista que deve passar a valer; vazia remove todas as atuais
      */
-    public PacienteComAlergia atualizar(Long idPaciente, Long idUsuario, Paciente dados,
+    public PacienteDetalhado atualizar(Long idPaciente, Long idUsuario, Paciente dados,
                                          List<Alergia> alergias) {
         Paciente paciente = buscarDoUsuario(idPaciente, idUsuario);
 
@@ -69,7 +69,7 @@ public class PacienteUseCase {
 
         List<Alergia> informadas = sincronizarAlergias(idPaciente, alergias);
 
-        return new PacienteComAlergia(
+        return new PacienteDetalhado(
                 atualizado,
                 informadas,
                 diagnosticoRepository.buscarCronicosPorPaciente(idPaciente),
