@@ -8,10 +8,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Geração e validação do código OTP (UC01), mantido em memória por ser
- * de curtíssima duração (5 minutos) e de uso único.
- */
 @Component
 public class OtpService {
 

@@ -7,11 +7,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
-/**
- * Enquanto app.mail.enabled=false (padrão em desenvolvimento, sem credenciais SMTP
- * configuradas), o código OTP é apenas logado no console. Assim que houver SMTP
- * configurado (spring.mail.*), basta setar app.mail.enabled=true para envio real.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
